@@ -13,6 +13,7 @@ script_dir = pathlib.Path(__file__).parent.parent
 sys.path.append(os.fspath(script_dir))
 sys.path.append(os.fspath(script_dir / "lib" / "python"))
 
+
 # Inherit from str so it's JSON serializable.
 class TestNodeTypeEnum(str, enum.Enum):
     class_ = "class"
