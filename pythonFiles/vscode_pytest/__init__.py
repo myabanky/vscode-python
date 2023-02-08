@@ -1,32 +1,31 @@
-# -*- coding: utf-8 -*-
 import enum
 import json
 import os
 import pathlib
 import sys
-from typing import List, Literal, Tuple, TypedDict, Union
+from typing import Dict, List, Literal, Tuple, TypedDict, Union
 
 import pytest
-from _pytest.doctest import DoctestItem, DoctestTextfile
+from _pytest.doctest import DoctestItem
+from testing_tools import socket_manager
+from typing_extensions import NotRequired
 
+DEFAULT_PORT = "45454"
 script_dir = pathlib.Path(__file__).parent.parent
 sys.path.append(os.fspath(script_dir))
 sys.path.append(os.fspath(script_dir / "lib" / "python"))
 
 
 # Inherit from str so it's JSON serializable.
-class TestNodeTypeEnum(str, enum.Enum):
-    class_ = "class"
-    file = "file"
-    folder = "folder"
-    test = "test"
-    doc_file = "doc_file"
+
+#test types
+# "class", "file", "folder", "test", "doc_file"
 
 
 class TestData(TypedDict):
     name: str
     path: str
-    type_: TestNodeTypeEnum
+    type_: Literal["class", "file", "folder", "test", "doc_file"]
     id_: str
 
 
@@ -38,19 +37,13 @@ class TestItem(TestData):
 class TestNode(TestData):
     children: "List[Union[TestNode, TestItem]]"
 
-
-from testing_tools import socket_manager
-from typing_extensions import NotRequired
-
-DEFAULT_PORT = "45454"
-
-
 def pytest_collection_finish(session):
     # Called after collection has been performed.
     node: Union[TestNode, None] = build_test_tree(session)[0]
-    cwd = pathlib.Path.cwd()
+    
     if node:
-        sendPost(str(cwd), node)
+        cwd = pathlib.Path.cwd()
+        post_response(str(cwd), node)
     # TODO: add error checking.
 
 
@@ -64,14 +57,14 @@ def build_test_tree(session) -> Tuple[Union[TestNode, None], List[str]]:
 
     for test_case in session.items:
         test_node: TestItem = create_test_node(test_case)
-        if type(test_case.parent) == DoctestTextfile:
+        if isinstance(test_case, DoctestItem):
             try:
                 parent_test_case: TestNode = file_nodes_dict[test_case.parent]
             except KeyError:
                 parent_test_case: TestNode = create_doc_file_node(test_case.parent)
                 file_nodes_dict[test_case.parent] = parent_test_case
             parent_test_case["children"].append(test_node)
-        elif type(test_case.parent) is pytest.Module:
+        elif isinstance(test_case.parent, pytest.Module):
             try:
                 parent_test_case: TestNode = file_nodes_dict[test_case.parent]
             except KeyError:
@@ -115,12 +108,12 @@ def build_nested_folders(
     created_files_folders_dict: dict[str, TestNode],
     session: pytest.Session,
 ) -> TestNode:
-    prev_folder_node: TestNode = file_node
+    prev_folder_node = file_node
 
     # Begin the i_path iteration one level above the current file.
-    iterator_path: pathlib.Path = file_module.path.parent
+    iterator_path = file_module.path.parent
     while iterator_path != session.path:
-        curr_folder_name: str = iterator_path.name
+        curr_folder_name = iterator_path.name
         try:
             curr_folder_node: TestNode = created_files_folders_dict[curr_folder_name]
         except KeyError:
@@ -145,7 +138,7 @@ def create_test_node(
         "name": test_case.name,
         "path": str(test_case.path),
         "lineno": test_case_loc,
-        "type_": TestNodeTypeEnum.test,
+        "type_": "test",
         "id_": test_case.nodeid,
         "runID": test_case.nodeid,
     }
@@ -155,7 +148,7 @@ def create_session_node(session: pytest.Session) -> TestNode:
     return {
         "name": session.name,
         "path": str(session.path),
-        "type_": TestNodeTypeEnum.folder,
+        "type_": "folder",
         "children": [],
         "id_": str(session.path),
     }
@@ -165,7 +158,7 @@ def create_class_node(class_module: pytest.Class) -> TestNode:
     return {
         "name": class_module.name,
         "path": str(class_module.path),
-        "type_": TestNodeTypeEnum.class_,
+        "type_": "class",
         "children": [],
         "id_": class_module.nodeid,
     }
@@ -175,7 +168,7 @@ def create_file_node(file_module: pytest.Module) -> TestNode:
     return {
         "name": str(file_module.path.name),
         "path": str(file_module.path),
-        "type_": TestNodeTypeEnum.file,
+        "type_": "file",
         "id_": str(file_module.path),
         "children": [],
     }
@@ -185,7 +178,7 @@ def create_doc_file_node(file_module: pytest.Module) -> TestNode:
     return {
         "name": str(file_module.path.name),
         "path": str(file_module.path),
-        "type_": TestNodeTypeEnum.doc_file,
+        "type_": "doc_file",
         "id_": str(file_module.path),
         "children": [],
     }
@@ -195,7 +188,7 @@ def create_folder_node(folderName: str, path_iterator: pathlib.Path) -> TestNode
     return {
         "name": folderName,
         "path": str(path_iterator),
-        "type_": TestNodeTypeEnum.folder,
+        "type_": "folder",
         "id_": str(path_iterator),
         "children": [],
     }
@@ -208,7 +201,7 @@ class PayloadDict(TypedDict):
     errors: NotRequired[List[str]]
 
 
-def sendPost(cwd: str, tests: TestNode) -> None:
+def post_response(cwd: str, tests: TestNode) -> None:
     # Sends a post request as a response to the server.
     payload: PayloadDict = {"cwd": cwd, "status": "success", "tests": tests}
     testPort: Union[str, int] = os.getenv("TEST_PORT", 45454)
