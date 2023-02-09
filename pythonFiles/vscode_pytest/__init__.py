@@ -18,6 +18,10 @@ from typing import Dict, List, Optional, Tuple, Union
 
 
 class TestData:
+    """
+    Stores all the data that is common to all test nodes.
+    """
+
     name: str
     path: str
     type_: Literal["class", "file", "folder", "test", "doc_file"]
@@ -37,6 +41,10 @@ class TestData:
 
 
 class TestItem(TestData):
+    """
+    Stores the data specific to a test item which is a runnable test.
+    """
+
     lineno: str
     runID: str
 
@@ -55,21 +63,36 @@ class TestItem(TestData):
 
 
 class TestNode(TestData):
+    """
+    A general class that handles all test data which contains children.
+    """
+
     children: "List[Union[TestNode, TestItem]]"
 
 
 def pytest_collection_finish(session):
-    # Called after collection has been performed.
-    node: Union[TestNode, None] = build_test_tree(session)[0]
+    """
+    A pytest hook that is called after collection has been performed.
 
-    if node:
+    Keyword arguments:
+    session -- the pytest session object.
+    """
+    # Called after collection has been performed.
+    session_node: Union[TestNode, None] = build_test_tree(session)[0]
+
+    if session_node:
         cwd = pathlib.Path.cwd()
-        post_response(os.fsdecode(cwd), node)
+        post_response(os.fsdecode(cwd), session_node)
     # TODO: add error checking.
 
 
 def build_test_tree(session) -> Tuple[Union[TestNode, None], List[str]]:
-    # Builds a tree of tests from the pytest session.
+    """
+    Builds a tree made up of testing nodes from the pytest session.
+
+    Keyword arguments:
+    session -- the pytest session object.
+    """
     errors: List[str] = []
     session_node = create_session_node(session)
     session_children_dict: Dict[str, TestNode] = {}
@@ -130,6 +153,15 @@ def build_nested_folders(
     created_files_folders_dict: Dict[str, TestNode],
     session: pytest.Session,
 ) -> TestNode:
+    """
+    Takes a file or folder and builds the nested folder structure for it.
+
+    Keyword arguments:
+    file_module -- the created module for the file we  are nesting.
+    file_node -- the file node that we are building the nested folders for.
+    created_files_folders_dict -- Dictionary of all the folders and files that have been created.
+    session -- the pytest session object.
+    """
     prev_folder_node = file_node
 
     # Begin the i_path iteration one level above the current file.
@@ -151,6 +183,12 @@ def build_nested_folders(
 def create_test_node(
     test_case: pytest.Item,
 ) -> TestItem:
+    """
+    Creates a test node from a pytest test case.
+
+    Keyword arguments:
+    test_case -- the pytest test case.
+    """
     test_case_loc: str = (
         "" if test_case.location[1] is None else str(test_case.location[1] + 1)
     )
@@ -165,6 +203,12 @@ def create_test_node(
 
 
 def create_session_node(session: pytest.Session) -> TestNode:
+    """
+    Creates a session node from a pytest session.
+
+    Keyword arguments:
+    session -- the pytest session.
+    """
     return {
         "name": session.name,
         "path": str(session.path),
@@ -175,6 +219,12 @@ def create_session_node(session: pytest.Session) -> TestNode:
 
 
 def create_class_node(class_module: pytest.Class) -> TestNode:
+    """
+    Creates a class node from a pytest class object.
+
+    Keyword arguments:
+    class_module -- the pytest object representing a class module.
+    """
     return {
         "name": class_module.name,
         "path": str(class_module.path),
@@ -185,6 +235,12 @@ def create_class_node(class_module: pytest.Class) -> TestNode:
 
 
 def create_file_node(file_module: pytest.Module) -> TestNode:
+    """
+    Creates a file node from a pytest file module.
+
+    Keyword arguments:
+    file_module -- the pytest file module.
+    """
     return {
         "name": file_module.path.name,
         "path": str(file_module.path),
@@ -195,6 +251,12 @@ def create_file_node(file_module: pytest.Module) -> TestNode:
 
 
 def create_doc_file_node(file_module: pytest.Module) -> TestNode:
+    """
+    Creates a doc file node from a pytest doc test file module.
+
+    Keyword arguments:
+    file_module -- the module for the doc test file.
+    """
     return {
         "name": str(file_module.path.name),
         "path": str(file_module.path),
@@ -205,6 +267,13 @@ def create_doc_file_node(file_module: pytest.Module) -> TestNode:
 
 
 def create_folder_node(folderName: str, path_iterator: pathlib.Path) -> TestNode:
+    """
+    Creates a folder node from a pytest folder name and its path.
+
+    Keyword arguments:
+    folderName -- the name of the folder.
+    path_iterator -- the path of the folder.
+    """
     return {
         "name": folderName,
         "path": str(path_iterator),
@@ -215,15 +284,26 @@ def create_folder_node(folderName: str, path_iterator: pathlib.Path) -> TestNode
 
 
 class PayloadDict(Dict[str, str]):
+    """
+    A dictionary that is used to send a post request to the server.
+    """
+
     cwd: str
     status: Literal["success", "error"]
     tests: Optional[TestNode]
     errors: Optional[List[str]]
 
 
-def post_response(cwd: str, tests: TestNode) -> None:
+def post_response(cwd: str, session_node: TestNode) -> None:
+    """
+    Sends a post request to the server.
+
+    Keyword arguments:
+    cwd -- the current working directory.
+    session_node -- the session node, which is the top of the testing tree.
+    """
     # Sends a post request as a response to the server.
-    payload: PayloadDict = {"cwd": cwd, "status": "success", "tests": tests}
+    payload: PayloadDict = {"cwd": cwd, "status": "success", "tests": session_node}
     testPort: Union[str, int] = os.getenv("TEST_PORT", 45454)
     testuuid: Union[str, None] = os.getenv("TEST_UUID")
     addr = "localhost", int(testPort)
