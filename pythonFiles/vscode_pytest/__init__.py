@@ -1,4 +1,3 @@
-import enum
 import json
 import os
 import pathlib
@@ -17,49 +16,22 @@ sys.path.append(os.fspath(script_dir / "lib" / "python"))
 from typing import Dict, List, Optional, Tuple, Union
 
 
-class TestData:
+class TestData(Dict):
     """
-    Stores all the data that is common to all test nodes.
+    A general class that all test objects inherit from.
     """
-
     name: str
     path: str
     type_: Literal["class", "file", "folder", "test", "doc_file"]
     id_: str
 
-    def __init__(
-        self,
-        name: str,
-        path: str,
-        type_: Literal["class", "file", "folder", "test", "doc_file"],
-        id_: str,
-    ):
-        self.name = name
-        self.path = path
-        self.type_ = type_
-        self.id_ = id_
-
 
 class TestItem(TestData):
     """
-    Stores the data specific to a test item which is a runnable test.
+    A class defining test items.
     """
-
     lineno: str
     runID: str
-
-    def __init__(
-        self,
-        name: str,
-        path: str,
-        type_: Literal["class", "file", "folder", "test", "doc_file"],
-        id_: str,
-        lineno: str,
-        runID: str,
-    ):
-        super().__init__(name, path, type_, id_)
-        self.lineno = lineno
-        self.runID = runID
 
 
 class TestNode(TestData):
@@ -141,8 +113,9 @@ def build_test_tree(session) -> Tuple[Union[TestNode, None], List[str]]:
             file_module, file_node, created_files_folders_dict, session
         )
         # The final folder we get to is the highest folder in the path and therefore we add this as a child to the session.
-        if root_folder_node.get("id_") not in session_children_dict:
-            session_children_dict[root_folder_node.get("id_")] = root_folder_node
+        root_id = root_folder_node.get("id_")
+        if root_id and root_id not in session_children_dict:
+            session_children_dict[root_id] = root_folder_node
     session_node["children"] = list(session_children_dict.values())
     return session_node, errors
 
@@ -192,14 +165,16 @@ def create_test_node(
     test_case_loc: str = (
         "" if test_case.location[1] is None else str(test_case.location[1] + 1)
     )
-    return {
-        "name": test_case.name,
-        "path": str(test_case.path),
-        "lineno": test_case_loc,
-        "type_": "test",
-        "id_": test_case.nodeid,
-        "runID": test_case.nodeid,
-    }
+    return TestItem(
+        {
+            "name": test_case.name,
+            "path": test_case.path,
+            "lineno": test_case_loc,
+            "type_": "test",
+            "id_": test_case.nodeid,
+            "runID": test_case.nodeid,
+        }
+    )
 
 
 def create_session_node(session: pytest.Session) -> TestNode:
@@ -209,13 +184,15 @@ def create_session_node(session: pytest.Session) -> TestNode:
     Keyword arguments:
     session -- the pytest session.
     """
-    return {
-        "name": session.name,
-        "path": str(session.path),
-        "type_": "folder",
-        "children": [],
-        "id_": str(session.path),
-    }
+    return TestNode(
+        {
+            "name": session.name,
+            "path": session.path,
+            "type_": "folder",
+            "children": [],
+            "id_": str(session.path),
+        }
+    )
 
 
 def create_class_node(class_module: pytest.Class) -> TestNode:
@@ -225,13 +202,15 @@ def create_class_node(class_module: pytest.Class) -> TestNode:
     Keyword arguments:
     class_module -- the pytest object representing a class module.
     """
-    return {
-        "name": class_module.name,
-        "path": str(class_module.path),
-        "type_": "class",
-        "children": [],
-        "id_": class_module.nodeid,
-    }
+    return TestNode(
+        {
+            "name": class_module.name,
+            "path": class_module.path,
+            "type_": "class",
+            "children": [],
+            "id_": class_module.nodeid,
+        }
+    )
 
 
 def create_file_node(file_module: pytest.Module) -> TestNode:
@@ -241,13 +220,15 @@ def create_file_node(file_module: pytest.Module) -> TestNode:
     Keyword arguments:
     file_module -- the pytest file module.
     """
-    return {
-        "name": file_module.path.name,
-        "path": str(file_module.path),
-        "type_": "file",
-        "id_": str(file_module.path),
-        "children": [],
-    }
+    return TestNode(
+        {
+            "name": file_module.path.name,
+            "path": file_module.path,
+            "type_": "file",
+            "id_": str(file_module.path),
+            "children": [],
+        }
+    )
 
 
 def create_doc_file_node(file_module: pytest.Module) -> TestNode:
@@ -257,13 +238,15 @@ def create_doc_file_node(file_module: pytest.Module) -> TestNode:
     Keyword arguments:
     file_module -- the module for the doc test file.
     """
-    return {
-        "name": str(file_module.path.name),
-        "path": str(file_module.path),
-        "type_": "doc_file",
-        "id_": str(file_module.path),
-        "children": [],
-    }
+    return TestNode(
+        {
+            "name": file_module.path.name,
+            "path": file_module.path,
+            "type_": "doc_file",
+            "id_": str(file_module.path),
+            "children": [],
+        }
+    )
 
 
 def create_folder_node(folderName: str, path_iterator: pathlib.Path) -> TestNode:
@@ -274,16 +257,18 @@ def create_folder_node(folderName: str, path_iterator: pathlib.Path) -> TestNode
     folderName -- the name of the folder.
     path_iterator -- the path of the folder.
     """
-    return {
-        "name": folderName,
-        "path": str(path_iterator),
-        "type_": "folder",
-        "id_": str(path_iterator),
-        "children": [],
-    }
+    return TestNode(
+        {
+            "name": folderName,
+            "path": path_iterator,
+            "type_": "folder",
+            "id_": str(path_iterator),
+            "children": [],
+        }
+    )
 
 
-class PayloadDict(Dict[str, str]):
+class PayloadDict(Dict):
     """
     A dictionary that is used to send a post request to the server.
     """
@@ -303,7 +288,7 @@ def post_response(cwd: str, session_node: TestNode) -> None:
     session_node -- the session node, which is the top of the testing tree.
     """
     # Sends a post request as a response to the server.
-    payload: PayloadDict = {"cwd": cwd, "status": "success", "tests": session_node}
+    payload = PayloadDict({"cwd": cwd, "status": "success", "tests": session_node})
     testPort: Union[str, int] = os.getenv("TEST_PORT", 45454)
     testuuid: Union[str, None] = os.getenv("TEST_UUID")
     addr = "localhost", int(testPort)
