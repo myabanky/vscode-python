@@ -20,6 +20,7 @@ class TestData(Dict):
     """
     A general class that all test objects inherit from.
     """
+
     name: str
     path: str
     type_: Literal["class", "file", "folder", "test", "doc_file"]
@@ -30,6 +31,7 @@ class TestItem(TestData):
     """
     A class defining test items.
     """
+
     lineno: str
     runID: str
 
