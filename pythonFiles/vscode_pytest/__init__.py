@@ -51,6 +51,7 @@ def pytest_collection_finish(session):
     Keyword arguments:
     session -- the pytest session object.
     """
+    print("pytest_collection_finish")
     # Called after collection has been performed.
     session_node: Union[TestNode, None] = build_test_tree(session)[0]
 
@@ -170,7 +171,7 @@ def create_test_node(
     return TestItem(
         {
             "name": test_case.name,
-            "path": test_case.path,
+            "path": str(test_case.path),
             "lineno": test_case_loc,
             "type_": "test",
             "id_": test_case.nodeid,
@@ -189,7 +190,7 @@ def create_session_node(session: pytest.Session) -> TestNode:
     return TestNode(
         {
             "name": session.name,
-            "path": session.path,
+            "path": str(session.path),
             "type_": "folder",
             "children": [],
             "id_": str(session.path),
@@ -207,7 +208,7 @@ def create_class_node(class_module: pytest.Class) -> TestNode:
     return TestNode(
         {
             "name": class_module.name,
-            "path": class_module.path,
+            "path": str(class_module.path),
             "type_": "class",
             "children": [],
             "id_": class_module.nodeid,
@@ -225,7 +226,7 @@ def create_file_node(file_module: pytest.Module) -> TestNode:
     return TestNode(
         {
             "name": file_module.path.name,
-            "path": file_module.path,
+            "path": str(file_module.path),
             "type_": "file",
             "id_": str(file_module.path),
             "children": [],
@@ -243,7 +244,7 @@ def create_doc_file_node(file_module: pytest.Module) -> TestNode:
     return TestNode(
         {
             "name": file_module.path.name,
-            "path": file_module.path,
+            "path": str(file_module.path),
             "type_": "doc_file",
             "id_": str(file_module.path),
             "children": [],
@@ -262,7 +263,7 @@ def create_folder_node(folderName: str, path_iterator: pathlib.Path) -> TestNode
     return TestNode(
         {
             "name": folderName,
-            "path": path_iterator,
+            "path": str(path_iterator),
             "type_": "folder",
             "id_": str(path_iterator),
             "children": [],
@@ -295,9 +296,7 @@ def post_response(cwd: str, session_node: TestNode) -> None:
     testuuid: Union[str, None] = os.getenv("TEST_UUID")
     addr = "localhost", int(testPort)
     data = json.dumps(payload)
-    request = f"""POST / HTTP/1.1
-Host: localhost:{testPort}
-Content-Length: {len(data)}
+    request = f"""Content-Length: {len(data)}
 Content-Type: application/json
 Request-uuid: {testuuid}
 
