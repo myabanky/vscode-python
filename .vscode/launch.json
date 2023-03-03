@@ -7,13 +7,20 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
-            "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}"
+            ],
             "stopOnEntry": false,
             "smartStep": true,
             "sourceMaps": true,
-            "outFiles": ["${workspaceFolder}/out/**/*", "!${workspaceFolder}/**/node_modules**/*"],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*",
+                "!${workspaceFolder}/**/node_modules**/*"
+            ],
             "preLaunchTask": "Compile",
-            "skipFiles": ["<node_internals>/**"],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
             "env": {
                 // Enable this to turn on redux logging during debugging
                 "XVSC_PYTHON_FORCE_LOGGING": "1",
@@ -30,11 +37,17 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
-            "args": ["--extensionDevelopmentPath=${workspaceFolder}", "${workspaceFolder}/data"],
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}",
+                "${workspaceFolder}/data"
+            ],
             "stopOnEntry": false,
             "smartStep": true,
             "sourceMaps": true,
-            "outFiles": ["${workspaceFolder}/out/**/*", "!${workspaceFolder}/**/node_modules**/*"],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*",
+                "!${workspaceFolder}/**/node_modules**/*"
+            ],
             "preLaunchTask": "Compile"
         },
         {
@@ -58,12 +71,17 @@
             "stopOnEntry": false,
             "sourceMaps": true,
             "smartStep": true,
-            "outFiles": ["${workspaceFolder}/out/**/*", "!${workspaceFolder}/**/node_modules**/*"],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*",
+                "!${workspaceFolder}/**/node_modules**/*"
+            ],
             "preLaunchTask": "Compile",
             "env": {
                 "IS_CI_SERVER_TEST_DEBUGGER": "1"
             },
-            "skipFiles": ["<node_internals>/**"]
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
         },
         {
             // Note, for the smoke test you want to debug, you may need to copy the file,
@@ -85,9 +103,14 @@
             },
             "stopOnEntry": false,
             "sourceMaps": true,
-            "outFiles": ["${workspaceFolder}/out/**/*.js", "!${workspaceFolder}/**/node_modules**/*"],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js",
+                "!${workspaceFolder}/**/node_modules**/*"
+            ],
             "preLaunchTask": "Compile",
-            "skipFiles": ["<node_internals>/**"]
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
         },
         {
             "name": "Tests (Single Workspace, VS Code, *.test.ts)",
@@ -105,9 +128,14 @@
             },
             "stopOnEntry": false,
             "sourceMaps": true,
-            "outFiles": ["${workspaceFolder}/out/**/*.js", "!${workspaceFolder}/**/node_modules**/*"],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js",
+                "!${workspaceFolder}/**/node_modules**/*"
+            ],
             "preLaunchTask": "Compile",
-            "skipFiles": ["<node_internals>/**"]
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
         },
         {
             "name": "Jedi LSP tests",
@@ -125,9 +153,14 @@
             },
             "stopOnEntry": false,
             "sourceMaps": true,
-            "outFiles": ["${workspaceFolder}/out/**/*.js", "!${workspaceFolder}/**/node_modules**/*"],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js",
+                "!${workspaceFolder}/**/node_modules**/*"
+            ],
             "preLaunchTask": "preTestJediLSP",
-            "skipFiles": ["<node_internals>/**"]
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
         },
         {
             "name": "Tests (Multiroot, VS Code, *.test.ts)",
@@ -143,9 +176,14 @@
             "stopOnEntry": false,
             "sourceMaps": true,
             "smartStep": true,
-            "outFiles": ["${workspaceFolder}/out/**/*", "!${workspaceFolder}/**/node_modules**/*"],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*",
+                "!${workspaceFolder}/**/node_modules**/*"
+            ],
             "preLaunchTask": "Compile",
-            "skipFiles": ["<node_internals>/**"]
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
         },
         {
             "name": "Unit Tests (without VS Code, *.unit.test.ts)",
@@ -163,9 +201,14 @@
                 //"--grep", "<suite name>",
                 "--timeout=300000"
             ],
-            "outFiles": ["${workspaceFolder}/out/**/*.js", "!${workspaceFolder}/**/node_modules**/*"],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js",
+                "!${workspaceFolder}/**/node_modules**/*"
+            ],
             "preLaunchTask": "Compile",
-            "skipFiles": ["<node_internals>/**"]
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
         },
         {
             "name": "Unit Tests (fast, without VS Code and without react/monaco, *.unit.test.ts)",
@@ -184,9 +227,14 @@
                 "--timeout=300000",
                 "--fast"
             ],
-            "outFiles": ["${workspaceFolder}/out/**/*.js", "!${workspaceFolder}/**/node_modules**/*"],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js",
+                "!${workspaceFolder}/**/node_modules**/*"
+            ],
             "preLaunchTask": "Compile",
-            "skipFiles": ["<node_internals>/**"]
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
         },
         {
             "name": "Functional Tests (without VS Code, *.functional.test.ts)",
@@ -219,23 +267,34 @@
                 // Remove 'X' prefix to dump webview redux action log
                 "XVSC_PYTHON_WEBVIEW_LOG_FILE": "${workspaceRoot}/test-webview.log"
             },
-            "outFiles": ["${workspaceFolder}/out/**/*.js", "!${workspaceFolder}/**/node_modules**/*"],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js",
+                "!${workspaceFolder}/**/node_modules**/*"
+            ],
             "preLaunchTask": "Compile",
-            "skipFiles": ["<node_internals>/**"]
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
         },
         {
             "type": "node",
             "request": "launch",
             "name": "Gulp tasks (helpful for debugging gulpfile.js)",
             "program": "${workspaceFolder}/node_modules/gulp/bin/gulp.js",
-            "args": ["watch"],
-            "skipFiles": ["<node_internals>/**"]
+            "args": [
+                "watch"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
         },
         {
             "name": "Node: Current File",
             "program": "${file}",
             "request": "launch",
-            "skipFiles": ["<node_internals>/**"],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
             "type": "pwa-node"
         },
         {
@@ -251,7 +310,20 @@
             "name": "Listen",
             "type": "python",
             "request": "attach",
-            "listen": { "host": "localhost", "port": 5678 },
+            "listen": {
+                "host": "localhost",
+                "port": 5678
+            },
+            "justMyCode": true
+        },
+        {
+            "name": "Pytest Module",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/test_discovery.py"
+            ],
             "justMyCode": true
         },
         {
@@ -266,7 +338,10 @@
     "compounds": [
         {
             "name": "Debug Test Discovery",
-            "configurations": ["Listen", "Extension"]
+            "configurations": [
+                "Listen",
+                "Extension"
+            ]
         }
     ]
 }
