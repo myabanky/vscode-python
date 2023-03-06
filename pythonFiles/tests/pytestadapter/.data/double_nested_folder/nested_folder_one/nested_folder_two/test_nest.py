@@ -2,9 +2,5 @@
 # Licensed under the MIT License.
 
 
-def test_top_function_t():
-    assert True
-
-
-def test_top_function_f():
-    assert False
+def test_function(string):
+    assert string == string
