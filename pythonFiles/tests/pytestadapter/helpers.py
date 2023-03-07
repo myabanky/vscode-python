@@ -27,9 +27,6 @@ def create_server(host=None, port=0, backlog=socket.SOMAXCONN, timeout=None):
     try:
         server = _new_sock()
         if port != 0:
-            # If binding to a specific port, make sure that the user doesn't have
-            # to wait until the OS times out the socket to be able to use that port
-            # again.if the server or the adapter crash or are force-killed.
             if sys.platform == "win32":
                 server.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
             else:
@@ -54,11 +51,6 @@ def create_client():
 
 def _new_sock():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
-
-    # Set TCP keepalive on an open socket.
-    # It activates after 1 second (TCP_KEEPIDLE,) of idleness,
-    # then sends a keepalive ping once every 3 seconds (TCP_KEEPINTVL),
-    # and closes the connection after 5 failed ping (TCP_KEEPCNT), or 15 seconds
     try:
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
     except (AttributeError, OSError):
