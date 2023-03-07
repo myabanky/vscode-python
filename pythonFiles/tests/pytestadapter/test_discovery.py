@@ -23,10 +23,6 @@ from .helpers import TEST_DATA_PATH, runner
     [("error_parametrize_discovery.py", 1), ("error_syntax_discovery.py", 1)],
 )
 def test_error_collect(file, expected_error_num):
-    """Test class for the error_discovery test. Runs pytest discovery on "error_discovery.py".
-
-    Should return
-    """
     actual = runner(["--collect-only", os.fspath(TEST_DATA_PATH / file)])
     assert actual is not None
     assert actual.get("status") == "error"
