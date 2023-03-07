@@ -2,7 +2,7 @@
 TEST_DATA_PATH = (
     "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/.data"
 )
-UNITTEST_FOLDER_PATH = "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/.data/unittest_folder/"
+UNITTEST_FOLDER_PATH = "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/.data/unittest_folder"
 
 # This is the expected output for the empty_discovery.py file.
 # └──
@@ -115,70 +115,70 @@ unittest_folder_discovery_expected_output = {
             "children": [
                 {
                     "name": "test_add.py",
-                    "path": UNITTEST_FOLDER_PATH + "test_add.py",
+                    "path": UNITTEST_FOLDER_PATH + "/test_add.py",
                     "type_": "file",
-                    "id_": UNITTEST_FOLDER_PATH + "test_add.py",
+                    "id_": UNITTEST_FOLDER_PATH + "/test_add.py",
                     "children": [
                         {
                             "name": "TestAddFunction",
-                            "path": UNITTEST_FOLDER_PATH + "test_add.py",
+                            "path": UNITTEST_FOLDER_PATH + "/test_add.py",
                             "type_": "class",
                             "children": [
                                 {
                                     "name": "test_add_negative_numbers",
-                                    "path": UNITTEST_FOLDER_PATH + "test_add.py",
-                                    "lineno": "13",
+                                    "path": UNITTEST_FOLDER_PATH + "/test_add.py",
+                                    "lineno": "15",
                                     "type_": "test",
                                     "id_": "unittest_folder/test_add.py::TestAddFunction::test_add_negative_numbers",
                                     "runID": "unittest_folder/test_add.py::TestAddFunction::test_add_negative_numbers",
                                 },
                                 {
                                     "name": "test_add_positive_numbers",
-                                    "path": UNITTEST_FOLDER_PATH + "test_add.py",
-                                    "lineno": "9",
+                                    "path": UNITTEST_FOLDER_PATH + "/test_add.py",
+                                    "lineno": "11",
                                     "type_": "test",
                                     "id_": "unittest_folder/test_add.py::TestAddFunction::test_add_positive_numbers",
                                     "runID": "unittest_folder/test_add.py::TestAddFunction::test_add_positive_numbers",
                                 },
                             ],
                             "id_": "unittest_folder/test_add.py::TestAddFunction",
-                        },
+                        }
                     ],
                 },
                 {
                     "name": "test_subtract.py",
-                    "path": UNITTEST_FOLDER_PATH + "test_subtract.py",
+                    "path": UNITTEST_FOLDER_PATH + "/test_subtract.py",
                     "type_": "file",
-                    "id_": UNITTEST_FOLDER_PATH + "test_subtract.py",
+                    "id_": UNITTEST_FOLDER_PATH + "/test_subtract.py",
                     "children": [
                         {
                             "name": "TestSubtractFunction",
-                            "path": UNITTEST_FOLDER_PATH + "test_subtract.py",
+                            "path": UNITTEST_FOLDER_PATH + "/test_subtract.py",
                             "type_": "class",
                             "children": [
                                 {
                                     "name": "test_subtract_negative_numbers",
-                                    "path": UNITTEST_FOLDER_PATH + "test_subtract.py",
-                                    "lineno": "13",
+                                    "path": UNITTEST_FOLDER_PATH + "/test_subtract.py",
+                                    "lineno": "15",
                                     "type_": "test",
                                     "id_": "unittest_folder/test_subtract.py::TestSubtractFunction::test_subtract_negative_numbers",
                                     "runID": "unittest_folder/test_subtract.py::TestSubtractFunction::test_subtract_negative_numbers",
                                 },
                                 {
                                     "name": "test_subtract_positive_numbers",
-                                    "path": UNITTEST_FOLDER_PATH + "test_subtract.py",
-                                    "lineno": "9",
+                                    "path": UNITTEST_FOLDER_PATH + "/test_subtract.py",
+                                    "lineno": "11",
                                     "type_": "test",
                                     "id_": "unittest_folder/test_subtract.py::TestSubtractFunction::test_subtract_positive_numbers",
                                     "runID": "unittest_folder/test_subtract.py::TestSubtractFunction::test_subtract_positive_numbers",
                                 },
                             ],
                             "id_": "unittest_folder/test_subtract.py::TestSubtractFunction",
-                        },
+                        }
                     ],
                 },
             ],
-        },
+        }
     ],
     "id_": "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/.data",
 }
