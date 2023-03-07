@@ -259,9 +259,7 @@
             "type": "python",
             "request": "launch",
             "module": "pytest",
-            "args": [
-                "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/test_discovery.py"
-            ],
+            "args": ["/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/test_discovery.py"],
             "justMyCode": true
         }
     ],
