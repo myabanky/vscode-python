@@ -346,7 +346,7 @@ def post_response(cwd: str, session_node: TestNode, errors: List[str]) -> None:
     session_node -- the session node, which is the top of the testing tree.
     """
     # Sends a post request as a response to the server.
-    if len(errors) > 0:
+    if errors:
         payload = PayloadDict(
             {"cwd": cwd, "status": "error", "tests": session_node, "errors": errors}
         )
