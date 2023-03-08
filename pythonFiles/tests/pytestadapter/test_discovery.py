@@ -49,7 +49,7 @@ def test_error_collect(file, expected_error_num):
 )
 def test_pytest_collect(file, expected_const):
     """
-    Test to test pytest dicovery on a variety of test files/ folder structures.
+    Test to test pytest discovery on a variety of test files/ folder structures.
     Uses variables from expected_discovery_test_output.py to store the expected dictionary return.
     Only handles discovery and therefore already contains the arg --collect-only.
     All test discovery will succeed, be in the correct cwd, and match expected test output.

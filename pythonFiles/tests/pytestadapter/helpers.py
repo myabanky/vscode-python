@@ -1,47 +1,53 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import http.client
+import http.server
 import io
 import json
 import os
 import pathlib
 import socket
+import socketserver
 import subprocess
 import sys
 import threading
 import uuid
 from typing import Dict, List, Sequence, Union
+import ssl
 
 TEST_DATA_PATH = pathlib.Path(__file__).parent / ".data"
 
 
-def create_server(host=None, port=0, backlog=socket.SOMAXCONN, timeout=None):
-    """Return a local server socket listening on the given port."""
+# def create_server(host=None, port=0, backlog=socket.SOMAXCONN, timeout=None):
+# """Return a local server socket listening on the given port."""
 
-    assert backlog > 0
-    if host is None:
-        host = "127.0.0.1"
-    if port is None:
-        port = 0
+# assert backlog > 0
+# if host is None:
+#     host = "127.0.0.1"
+# if port is None:
+#     port = 0
 
-    try:
-        server = _new_sock()
-        if port != 0:
-            if sys.platform == "win32":
-                server.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
-            else:
-                try:
-                    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                except (AttributeError, OSError):
-                    pass  # Not available everywhere
-        server.bind((host, port))
-        if timeout is not None:
-            server.settimeout(timeout)
-        server.listen(backlog)
-    except Exception:
-        # server.close()
-        raise
-    return server
+# try:
+#     server = _new_sock()
+#     if port != 0:
+#         if sys.platform == "win32":
+#             server.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+#         else:
+#             try:
+#                 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+#             except (AttributeError, OSError):
+#                 pass  # Not available everywhere
+#     server.bind((host, port))
+#     if timeout is not None:
+#         server.settimeout(timeout)
+#     server.listen(backlog)
+# except Exception:
+#     # server.close()
+#     raise
+# return server
+
+# def create_server(host=None, port=0, backlog=socket.SOMAXCONN, timeout=None):
 
 
 def create_client():
@@ -129,9 +135,10 @@ def runner(args: List[str]) -> Union[Dict[str, str], None]:
         "vscode_pytest",
     ] + args
 
-    listener = create_server()
-    _, port = listener.getsockname()
-    listener.listen()
+    server_address = ("", 0)
+    Handler = PostHandlerPytest
+    httpd = http.server.HTTPServer(server_address, PostHandlerPytest)
+    ip, port = httpd.socket.getsockname()
 
     env = {
         "TEST_UUID": str(uuid.uuid4()),
@@ -140,7 +147,7 @@ def runner(args: List[str]) -> Union[Dict[str, str], None]:
     }
 
     result = []
-    t1 = threading.Thread(target=listen_on_socket, args=(listener, result))
+    t1 = threading.Thread(target=listen_on_socket, args=(httpd, result))
     t1.start()
 
     t2 = threading.Thread(
@@ -166,15 +173,28 @@ def subprocess_run_task(process_args: Sequence[str], env: Dict[str, str]):
     )
 
 
-def listen_on_socket(listener: socket.socket, result: List[str]):
+def listen_on_socket(httpd: http.server.HTTPServer, result: List[str]):
     """
     Helper function that listens on the given socket and appends the result to the given list.
     """
-    sock, (other_host, other_port) = listener.accept()
-    all_data = ""
-    while True:
-        data = sock.recv(1024 * 1024)
-        if not data:
-            break
-        all_data = all_data + data.decode("utf-8")
-    result.append(all_data)
+    httpd.serve_forever()
+
+    # response = conn.getresponse()
+    print(response.status, response.reason)
+    # all_data = ""
+    # while True:
+    #     data = sock.recv(1024 * 1024)
+    #     if not data:
+    #         break
+    #     all_data = all_data + data.decode("utf-8")
+    # result.append(all_data)
+
+
+class PostHandlerPytest(http.server.BaseHTTPRequestHandler):
+    def do_POST(self):
+        content_length = int(self.headers["Content-Length"])
+        body = self.rfile.read(content_length)
+        self.send_response(200)
+        self.end_headers()
+        response = f"Received POST request:\n\n{body}"
+        self.wfile.write(response.encode("utf-8"))
