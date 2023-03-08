@@ -1,7 +1,6 @@
-TEST_DATA_PATH = (
-    "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/.data"
-)
-UNITTEST_FOLDER_PATH = "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/.data/unittest_folder"
+from .helpers import TEST_DATA_PATH
+
+UNITTEST_FOLDER_PATH = f"{TEST_DATA_PATH}/unittest_folder"
 
 # This file contains the expected output dictionaries for tests discovery and is used in test_discovery.py.
 
@@ -58,18 +57,18 @@ unit_pytest_same_file_discovery_expected_output = {
     "children": [
         {
             "name": "unittest_pytest_same_file.py",
-            "path": TEST_DATA_PATH + "/unittest_pytest_same_file.py",
+            "path": f"{TEST_DATA_PATH}/unittest_pytest_same_file.py",
             "type_": "file",
-            "id_": TEST_DATA_PATH + "/unittest_pytest_same_file.py",
+            "id_": f"{TEST_DATA_PATH}/unittest_pytest_same_file.py",
             "children": [
                 {
                     "name": "TestExample",
-                    "path": TEST_DATA_PATH + "/unittest_pytest_same_file.py",
+                    "path": f"{TEST_DATA_PATH}/unittest_pytest_same_file.py",
                     "type_": "class",
                     "children": [
                         {
                             "name": "test_true_unittest",
-                            "path": TEST_DATA_PATH + "/unittest_pytest_same_file.py",
+                            "path": f"{TEST_DATA_PATH}/unittest_pytest_same_file.py",
                             "lineno": "8",
                             "type_": "test",
                             "id_": "unittest_pytest_same_file.py::TestExample::test_true_unittest",
@@ -80,7 +79,7 @@ unit_pytest_same_file_discovery_expected_output = {
                 },
                 {
                     "name": "test_true_pytest",
-                    "path": TEST_DATA_PATH + "/unittest_pytest_same_file.py",
+                    "path": f"{TEST_DATA_PATH}/unittest_pytest_same_file.py",
                     "lineno": "12",
                     "type_": "test",
                     "id_": "unittest_pytest_same_file.py::test_true_pytest",
@@ -105,7 +104,7 @@ unit_pytest_same_file_discovery_expected_output = {
 
 unittest_folder_discovery_expected_output = {
     "name": ".data",
-    "path": "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/.data",
+    "path": TEST_DATA_PATH,
     "type_": "folder",
     "children": [
         {
@@ -181,7 +180,7 @@ unittest_folder_discovery_expected_output = {
             ],
         }
     ],
-    "id_": "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/.data",
+    "id_": TEST_DATA_PATH,
 }
 
 # This is the expected output for the dual_level_nested_folder tests
@@ -332,18 +331,18 @@ double_nested_folder_expected_output = {
 
 parametrize_tests_expected_output = {
     "name": ".data",
-    "path": "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/.data",
+    "path": TEST_DATA_PATH,
     "type_": "folder",
     "children": [
         {
             "name": "parametrize_tests.py",
-            "path": "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/.data/parametrize_tests.py",
+            "path": f"{TEST_DATA_PATH}/parametrize_tests.py",
             "type_": "file",
             "id_": "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/.data/parametrize_tests.py",
             "children": [
                 {
                     "name": "test_adding[3+5-8]",
-                    "path": "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/.data/parametrize_tests.py",
+                    "path": f"{TEST_DATA_PATH}/parametrize_tests.py",
                     "lineno": "5",
                     "type_": "test",
                     "id_": "parametrize_tests.py::test_adding[3+5-8]",
@@ -351,7 +350,7 @@ parametrize_tests_expected_output = {
                 },
                 {
                     "name": "test_adding[2+4-6]",
-                    "path": "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/.data/parametrize_tests.py",
+                    "path": f"{TEST_DATA_PATH}/parametrize_tests.py",
                     "lineno": "5",
                     "type_": "test",
                     "id_": "parametrize_tests.py::test_adding[2+4-6]",
@@ -359,7 +358,7 @@ parametrize_tests_expected_output = {
                 },
                 {
                     "name": "test_adding[6+9-16]",
-                    "path": "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/.data/parametrize_tests.py",
+                    "path": f"{TEST_DATA_PATH}/parametrize_tests.py",
                     "lineno": "5",
                     "type_": "test",
                     "id_": "parametrize_tests.py::test_adding[6+9-16]",
@@ -368,5 +367,5 @@ parametrize_tests_expected_output = {
             ],
         }
     ],
-    "id_": "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/.data",
+    "id_": f"{TEST_DATA_PATH}/parametrize_tests.py",
 }
