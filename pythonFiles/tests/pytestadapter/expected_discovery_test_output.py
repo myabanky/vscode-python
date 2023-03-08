@@ -1,8 +1,9 @@
-# change to fit for everyone
 TEST_DATA_PATH = (
     "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/.data"
 )
 UNITTEST_FOLDER_PATH = "/Users/eleanorboyd/vscode-python/pythonFiles/tests/pytestadapter/.data/unittest_folder"
+
+# This file contains the expected output dictionaries for tests discovery and is used in test_discovery.py.
 
 # This is the expected output for the empty_discovery.py file.
 # └──

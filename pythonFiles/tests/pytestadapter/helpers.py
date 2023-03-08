@@ -51,6 +51,7 @@ def create_client():
 
 def _new_sock():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
+
     try:
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
     except (AttributeError, OSError):
@@ -88,6 +89,10 @@ CONTENT_LENGTH = "Content-Length:"
 
 
 def process_rpc_json(data: str) -> Dict[str, str]:
+    """
+    Process the RPC JSON data and checks to make sure it has a Content-Length header.
+    Returns the JSON data as a dictionary.
+    """
     str_stream = io.StringIO(data)
 
     length = None
@@ -111,6 +116,11 @@ def process_rpc_json(data: str) -> Dict[str, str]:
 
 
 def runner(args: List[str]) -> Union[Dict[str, str], None]:
+    """
+    Helper function that runs the pytest on the given args and returns the JSON data of the result.
+    This method uses multithreading to handle both creating a listener and running the pytest command
+    as a subprocess.
+    """
     process_args = [
         sys.executable,
         "-m",
@@ -146,6 +156,9 @@ def runner(args: List[str]) -> Union[Dict[str, str], None]:
 
 
 def subprocess_run_task(process_args: Sequence[str], env: Dict[str, str]):
+    """
+    Helper function that runs the given process args and env as a subprocess from the test data path.
+    """
     subprocess.run(
         process_args,
         env=env,
@@ -154,6 +167,9 @@ def subprocess_run_task(process_args: Sequence[str], env: Dict[str, str]):
 
 
 def listen_on_socket(listener: socket.socket, result: List[str]):
+    """
+    Helper function that listens on the given socket and appends the result to the given list.
+    """
     sock, (other_host, other_port) = listener.accept()
     all_data = ""
     while True:
