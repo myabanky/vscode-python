@@ -8,6 +8,7 @@ import traceback
 
 import pytest
 from _pytest.doctest import DoctestItem
+from _pytest.nodes import Node
 from testing_tools import socket_manager
 from typing_extensions import Literal
 
@@ -49,53 +50,16 @@ class TestNode(TestData):
 
 errors = []
 
-
-def pytest_collection_finish(session):
-    """
-    A pytest hook that is called after collection has been performed.
-
-    Keyword arguments:
-    session -- the pytest session object.
-    """
-    print("pytest_collection_finish")
-    # Called after collection has been performed.
-
-    # TODO: add error checking.
-
-    # def pytest_report_collectionfinish(config, start_path, startdir, items):
-
-
-# def pytest_report_teststatus(report, config):
-#     """
-#     A pytest hook that is called when a test is called. It is called 3 times per test,
-#       during setup, call, and teardown.
-
-#     Keyword arguments:
-#     report -- the report on the test setup, call, and teardown.
-#     config -- configuration object.
-#     """
-#     if report.failed:
-#         print("report.failed")
-#         cwd = pathlib.Path.cwd()
-#         errors.append(report.longreprtext)
-#         post_response(os.fsdecode(cwd), TestNode(), errors)
-#     print("report", report)
-
-
 def pytest_internalerror(excrepr, excinfo):
     errors.append(traceback.format_exc())
-    print("pytest_internalerror")
 
 
 def pytest_exception_interact(node, call, report):
-    # im worried this will not have a traceback to format, might need to use call.result or call.report
     errors.append(call.result)
-    print("pytest_exception_interact")
 
 
 def pytest_keyboard_interrupt(excinfo):
     errors.append(traceback.format_exc())
-    print("pytest_keyboard_interrupt")
 
 
 def pytest_sessionfinish(session, exitstatus):
@@ -106,8 +70,6 @@ def pytest_sessionfinish(session, exitstatus):
     session -- the pytest session object.
     exitstatus -- the status code of the session.
     """
-    # move all logic here as this is the final step that is reached
-    print("session")
     cwd = pathlib.Path.cwd()
     try:
         session_node: Union[TestNode, None] = build_test_tree(session)[0]
@@ -129,7 +91,7 @@ def build_test_tree(session) -> Tuple[Union[TestNode, None], List[str]]:
     errors: List[str] = []
     session_node = create_session_node(session)
     session_children_dict: Dict[str, TestNode] = {}
-    file_nodes_dict: Dict[pytest.Module, TestNode] = {}
+    file_nodes_dict: Dict[Node, TestNode] = {}
     class_nodes_dict: Dict[str, TestNode] = {}
 
     for test_case in session.items:
@@ -151,21 +113,32 @@ def build_test_tree(session) -> Tuple[Union[TestNode, None], List[str]]:
             parent_test_case["children"].append(test_node)
         else:  # should be a pytest.Class
             try:
-                test_class_node = class_nodes_dict[test_case.parent.name]
-            except KeyError:
-                test_class_node = create_class_node(test_case.parent)
-                class_nodes_dict[test_case.parent.name] = test_class_node
-            test_class_node["children"].append(test_node)
-            parent_module: pytest.Module = test_case.parent.parent
-            # Create a file node that has the class as a child.
-            try:
-                test_file_node = file_nodes_dict[parent_module]
-            except KeyError:
-                test_file_node = create_file_node(parent_module)
-                file_nodes_dict[parent_module] = test_file_node
-            # Check if the class is already a child of the file node.
-            if test_class_node not in test_file_node["children"]:
-                test_file_node["children"].append(test_class_node)
+                assert isinstance(test_case.parent, pytest.Class)
+            except AssertionError:
+                errors.append(
+                    f"Test case {test_case} has an invalid parent type {type(test_case.parent)}."
+                )
+            else:
+                try:
+                    test_class_node = class_nodes_dict[test_case.parent.name]
+                except KeyError:
+                    test_class_node = create_class_node(test_case.parent)
+                    class_nodes_dict[test_case.parent.name] = test_class_node
+                test_class_node["children"].append(test_node)
+                if test_case.parent.parent:
+                    parent_module: Node = test_case.parent.parent
+                else:
+                    errors.append(f"Test class {test_case.parent} has no parent.")
+                    break
+                # Create a file node that has the class as a child.
+                try:
+                    test_file_node = file_nodes_dict[parent_module]
+                except KeyError:
+                    test_file_node = create_file_node(parent_module)
+                    file_nodes_dict[parent_module] = test_file_node
+                # Check if the class is already a child of the file node.
+                if test_class_node not in test_file_node["children"]:
+                    test_file_node["children"].append(test_class_node)
     created_files_folders_dict: Dict[str, TestNode] = {}
     for file_module, file_node in file_nodes_dict.items():
         # Iterate through all the files that exist and construct them into nested folders.
@@ -181,7 +154,7 @@ def build_test_tree(session) -> Tuple[Union[TestNode, None], List[str]]:
 
 
 def build_nested_folders(
-    file_module: pytest.Module,
+    file_module: Node,
     file_node: TestNode,
     created_files_folders_dict: Dict[str, TestNode],
     session: pytest.Session,
@@ -273,7 +246,7 @@ def create_class_node(class_module: pytest.Class) -> TestNode:
     )
 
 
-def create_file_node(file_module: pytest.Module) -> TestNode:
+def create_file_node(file_module: Node) -> TestNode:
     """
     Creates a file node from a pytest file module.
 

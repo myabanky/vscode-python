@@ -1,8 +1,9 @@
+import os
 from .helpers import TEST_DATA_PATH
 
 # This is the expected output for the empty_discovery.py file.
 # └──
-TEST_DATA_PATH_STR = str(TEST_DATA_PATH)
+TEST_DATA_PATH_STR = os.fspath(TEST_DATA_PATH)
 empty_discovery_pytest_expected_output = {
     "name": ".data",
     "path": TEST_DATA_PATH_STR,

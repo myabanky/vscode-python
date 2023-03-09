@@ -259,7 +259,7 @@
             "type": "python",
             "request": "launch",
             "module": "pytest",
-            "args": [],
+            "args": ["${workspaceFolder}/pythonFiles/tests/pytestadapter"],
             "justMyCode": true
         }
     ],
