@@ -1,8 +1,6 @@
-import http.client
 import json
 import os
 import pathlib
-import ssl
 import sys
 import traceback
 
@@ -318,8 +316,8 @@ def post_response(cwd: str, session_node: TestNode, errors: List[str]) -> None:
     Keyword arguments:
     cwd -- the current working directory.
     session_node -- the session node, which is the top of the testing tree.
+    errors -- a list of errors that occurred during test collection.
     """
-    # Sends a post request as a response to the server.
     if errors:
         payload = PayloadDict(
             {"cwd": cwd, "status": "error", "tests": session_node, "errors": errors}
@@ -338,4 +336,4 @@ Request-uuid: {testuuid}
 {data}"""
     with socket_manager.SocketManager(addr) as s:
         if s.socket is not None:
-            s.socket.sendall(request.encode("utf-8"))  # type: ignore
+            s.socket.sendall(request.encode("utf-8"))
