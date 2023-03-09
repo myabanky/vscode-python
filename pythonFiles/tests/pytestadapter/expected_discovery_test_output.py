@@ -181,15 +181,14 @@ unittest_folder_discovery_expected_output = {
 }
 
 # This is the expected output for the dual_level_nested_folder tests
-#   |- dual_level_nested_folder
-#  |  |- test_top_folder.py
-#  |  |  |- test_top_function_t
-#  |  |  |- test_top_function_f
-#  |  |
-#  |  |- nested_folder_one
-#  |     |- test_bottom_folder.py
-#  |        |- test_bottom_function_t
-#  |        |- test_bottom_function_f
+#  └── dual_level_nested_folder
+#    └── test_top_folder.py
+#       └── test_top_function_t
+#       └── test_top_function_f
+#    └── nested_folder_one
+#       └── test_bottom_folder.py
+#          └── test_bottom_function_t
+#          └── test_bottom_function_f
 
 dual_level_nested_folder_expected_output = {
     "name": ".data",
@@ -366,6 +365,9 @@ parametrize_tests_expected_output = {
     ],
     "id_": TEST_DATA_PATH_STR,
 }
+
+# This is the expected output for the text_docstring.txt tests.
+# └── text_docstring.txt
 
 doctest_pytest_expected_output = {'name': '.data',
     'path': TEST_DATA_PATH_STR,
