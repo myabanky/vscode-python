@@ -45,6 +45,7 @@ def test_error_collect(file, expected_error_num):
         ("unittest_folder", unittest_folder_discovery_expected_output),
         ("dual_level_nested_folder", dual_level_nested_folder_expected_output),
         ("double_nested_folder", double_nested_folder_expected_output),
+
     ],
 )
 def test_pytest_collect(file, expected_const):
