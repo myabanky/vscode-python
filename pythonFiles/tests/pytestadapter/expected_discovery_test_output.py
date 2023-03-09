@@ -33,7 +33,7 @@ simple_discovery_pytest_expected_output = {
                 {
                     "name": "test_function",
                     "path": f"{TEST_DATA_PATH}/simple_pytest.py",
-                    "lineno": "5",
+                    "lineno": "6",
                     "type_": "test",
                     "id_": "simple_pytest.py::test_function",
                     "runID": "simple_pytest.py::test_function",
@@ -127,7 +127,7 @@ unittest_folder_discovery_expected_output = {
                                 {
                                     "name": "test_add_negative_numbers",
                                     "path": UNITTEST_FOLDER_PATH + "/test_add.py",
-                                    "lineno": "15",
+                                    "lineno": "19",
                                     "type_": "test",
                                     "id_": "unittest_folder/test_add.py::TestAddFunction::test_add_negative_numbers",
                                     "runID": "unittest_folder/test_add.py::TestAddFunction::test_add_negative_numbers",
@@ -135,7 +135,7 @@ unittest_folder_discovery_expected_output = {
                                 {
                                     "name": "test_add_positive_numbers",
                                     "path": UNITTEST_FOLDER_PATH + "/test_add.py",
-                                    "lineno": "11",
+                                    "lineno": "13",
                                     "type_": "test",
                                     "id_": "unittest_folder/test_add.py::TestAddFunction::test_add_positive_numbers",
                                     "runID": "unittest_folder/test_add.py::TestAddFunction::test_add_positive_numbers",
@@ -159,7 +159,7 @@ unittest_folder_discovery_expected_output = {
                                 {
                                     "name": "test_subtract_negative_numbers",
                                     "path": UNITTEST_FOLDER_PATH + "/test_subtract.py",
-                                    "lineno": "15",
+                                    "lineno": "19",
                                     "type_": "test",
                                     "id_": "unittest_folder/test_subtract.py::TestSubtractFunction::test_subtract_negative_numbers",
                                     "runID": "unittest_folder/test_subtract.py::TestSubtractFunction::test_subtract_negative_numbers",
@@ -167,7 +167,7 @@ unittest_folder_discovery_expected_output = {
                                 {
                                     "name": "test_subtract_positive_numbers",
                                     "path": UNITTEST_FOLDER_PATH + "/test_subtract.py",
-                                    "lineno": "11",
+                                    "lineno": "13",
                                     "type_": "test",
                                     "id_": "unittest_folder/test_subtract.py::TestSubtractFunction::test_subtract_positive_numbers",
                                     "runID": "unittest_folder/test_subtract.py::TestSubtractFunction::test_subtract_positive_numbers",
@@ -214,7 +214,7 @@ dual_level_nested_folder_expected_output = {
                         {
                             "name": "test_top_function_t",
                             "path": f"{TEST_DATA_PATH}/dual_level_nested_folder/test_top_folder.py",
-                            "lineno": "5",
+                            "lineno": "6",
                             "type_": "test",
                             "id_": "dual_level_nested_folder/test_top_folder.py::test_top_function_t",
                             "runID": "dual_level_nested_folder/test_top_folder.py::test_top_function_t",
@@ -222,7 +222,7 @@ dual_level_nested_folder_expected_output = {
                         {
                             "name": "test_top_function_f",
                             "path": f"{TEST_DATA_PATH}/dual_level_nested_folder/test_top_folder.py",
-                            "lineno": "9",
+                            "lineno": "11",
                             "type_": "test",
                             "id_": "dual_level_nested_folder/test_top_folder.py::test_top_function_f",
                             "runID": "dual_level_nested_folder/test_top_folder.py::test_top_function_f",
