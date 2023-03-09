@@ -48,6 +48,7 @@ class TestNode(TestData):
 
 errors = []
 
+
 def pytest_internalerror(excrepr, excinfo):
     errors.append(traceback.format_exc())
 
