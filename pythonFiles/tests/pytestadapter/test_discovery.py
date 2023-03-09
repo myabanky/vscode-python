@@ -3,6 +3,7 @@
 import os
 
 import pytest
+from .helpers import TEST_DATA_PATH
 
 from .expected_discovery_test_output import (
     double_nested_folder_expected_output,
@@ -19,18 +20,31 @@ from .helpers import TEST_DATA_PATH, runner
 
 @pytest.mark.parametrize(
     "file, expected_error_num",
-    [("error_parametrize_discovery.py", 1), ("error_syntax_discovery.py", 1)],
+    [("error_parametrize_discovery.py", 1), ("error_syntax_discovery.txt", 1)],
 )
 def test_error_collect(file, expected_error_num):
     """
     Tests pytest discovery on specific files that are expected to return errors.
     The json should still be returned but the errors list should be present.
     """
+    rename = False
+    py_name = ""
+    original_name = ""
+    # Saving some files as .txt to avoid that file displaying an error and
+    # just rename it before running this test in order to test the error handling.
+    if file.endswith(".txt"):
+        py_name = os.fspath(TEST_DATA_PATH / file[:-4]) + ".py"
+        original_name = os.fspath(TEST_DATA_PATH / file)
+        os.rename(original_name, py_name)
+        file = py_name
+        rename = True
     actual = runner(["--collect-only", os.fspath(TEST_DATA_PATH / file)])
     assert actual is not None
     assert actual.get("status") == "error"
     assert actual.get("cwd") == os.fspath(TEST_DATA_PATH)
     assert len(actual.get("errors", [])) == expected_error_num
+    if rename:
+        os.rename(py_name, original_name)
 
 
 # For the following tests, the expected output includes the line number that the test is on.
