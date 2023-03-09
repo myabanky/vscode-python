@@ -33,6 +33,8 @@ def test_error_collect(file, expected_error_num):
     assert len(actual.get("errors", [])) == expected_error_num
 
 
+# For the following tests, the expected output includes the line number that the test is on.
+# Therefore if the test file is changed (lines are added or deleted), the expected output will need to be updated to match.
 @pytest.mark.parametrize(
     "file, expected_const",
     [
