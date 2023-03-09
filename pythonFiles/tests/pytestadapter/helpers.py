@@ -64,7 +64,6 @@ def _new_sock():
     except (AttributeError, OSError):
         pass  # May not be available everywhere.
     try:
-        print("error")
         sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 1)  # type: ignore
     except (AttributeError, OSError):
         pass  # May not be available everywhere.
