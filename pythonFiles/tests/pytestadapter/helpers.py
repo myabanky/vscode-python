@@ -170,3 +170,15 @@ def listen_on_socket(listener: socket.socket, result: List[str]):
             break
         all_data = all_data + data.decode("utf-8")
     result.append(all_data)
+
+
+# dual_level_nested_folder/nested_folder_one/test_bottom_folder.py::test_bottom_function_f
+
+
+def find_test_line_no(test_id: str, test_file_path) -> str:
+    test_file_unique_id = "test_marker--" + test_id.split("[")[0].split("::")[-1]
+    with open(test_file_path) as f:
+        for i, line in enumerate(f):
+            if test_file_unique_id in line:
+                return str(i + 1)
+    raise ValueError("Test f{test_name} not found on any line in f{test_file_path}")
