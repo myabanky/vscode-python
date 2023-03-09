@@ -342,7 +342,6 @@ class PayloadDict(Dict):
 def post_response(cwd: str, session_node: TestNode, errors: List[str]) -> None:
     """
     Sends a post request to the server.
-
     Keyword arguments:
     cwd -- the current working directory.
     session_node -- the session node, which is the top of the testing tree.
@@ -356,18 +355,14 @@ def post_response(cwd: str, session_node: TestNode, errors: List[str]) -> None:
         payload = PayloadDict({"cwd": cwd, "status": "success", "tests": session_node})
 
     testPort: Union[str, int] = os.getenv("TEST_PORT", 45454)
-    # testuuid: Union[str, None] = os.getenv("TEST_UUID")
-    # addr = "localhost", int(testPort)
-    # data = (json.dumps(payload)).encode("utf-8")
-    headers = {
-        "Content-Length": str(len(payload)),
-        "Content-Type": "application/json",
-        "Request-uuid": os.getenv("TEST_UUID"),
-    }
-    conn = http.client.HTTPSConnection("localhost", int(testPort), context=ssl._create_unverified_context())
-    conn.request("POST", "/", body=json.dumps(payload), headers=headers)
-    conn.close()
+    testuuid: Union[str, None] = os.getenv("TEST_UUID")
+    addr = "localhost", int(testPort)
+    data = json.dumps(payload)
+    request = f"""Content-Length: {len(data)}
+Content-Type: application/json
+Request-uuid: {testuuid}
 
-    # with socket_manager.SocketManager(addr) as s:
-    #     if s.socket is not None:
-    #         s.socket.sendall(request.encode("utf-8"))  # type: ignore
+{data}"""
+    with socket_manager.SocketManager(addr) as s:
+        if s.socket is not None:
+            s.socket.sendall(request.encode("utf-8"))  # type: ignore
