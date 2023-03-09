@@ -1,4 +1,4 @@
-his is a doctest test
+This is a doctest test which passes
 >>> x = 3
 >>> x
 3
