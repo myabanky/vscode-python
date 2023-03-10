@@ -39,7 +39,7 @@ def test_error_collect(file, expected_error_num):
         file = py_name
         rename = True
     actual = runner(["--collect-only", os.fspath(TEST_DATA_PATH / file)])
-    assert actual is not None
+    assert actual
     assert actual.get("status") == "error"
     assert actual.get("cwd") == os.fspath(TEST_DATA_PATH)
     assert len(actual.get("errors", [])) == expected_error_num

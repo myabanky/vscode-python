@@ -15,21 +15,15 @@ from typing import Dict, List, Sequence, Union
 TEST_DATA_PATH = pathlib.Path(__file__).parent / ".data"
 
 
-def create_server(host=None, port=0, backlog=socket.SOMAXCONN, timeout=None):
+def create_server(host="127.0.0.1", port=0, backlog=socket.SOMAXCONN, timeout=None):
     """Return a local server socket listening on the given port."""
-
-    assert backlog > 0
-    if host is None:
-        host = "127.0.0.1"
-    if port is None:
-        port = 0
 
     try:
         server = _new_sock()
-        if port != 0:
+        if port:
             # If binding to a specific port, make sure that the user doesn't have
-            # to wait until the OS times out the socket to be able to use that port
-            # again.if the server or the adapter crash or are force-killed.
+            # to wait until the OS times out waiting for socket in order to use
+            # that port again if the server or the adapter crash or are force-killed.
             if sys.platform == "win32":
                 server.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
             else:
@@ -38,7 +32,7 @@ def create_server(host=None, port=0, backlog=socket.SOMAXCONN, timeout=None):
                 except (AttributeError, OSError):
                     pass  # Not available everywhere
         server.bind((host, port))
-        if timeout is not None:
+        if timeout:
             server.settimeout(timeout)
         server.listen(backlog)
     except Exception:
@@ -106,12 +100,12 @@ def process_rpc_json(data: str) -> Dict[str, str]:
             length = int(line[len(CONTENT_LENGTH) :])
             break
 
-        if not line or line.strip() == "":
+        if not line or line.isspace():
             raise ValueError("Header does not contain Content-Length")
 
     while True:
         line = str_stream.readline()
-        if not line or line.strip() == "":
+        if not line or line.isspace():
             break
 
     raw_json = str_stream.read(length)
@@ -163,19 +157,19 @@ def subprocess_run_task(process_args: Sequence[str], env: Dict[str, str]):
 
 def listen_on_socket(listener: socket.socket, result: List[str]):
     sock, (other_host, other_port) = listener.accept()
-    all_data = ""
+    all_data = []
     while True:
         data = sock.recv(1024 * 1024)
         if not data:
             break
-        all_data = all_data + data.decode("utf-8")
-    result.append(all_data)
+        all_data.append(data.decode("utf-8"))
+    result.append("".join(all_data))
 
 
 # dual_level_nested_folder/nested_folder_one/test_bottom_folder.py::test_bottom_function_f
 
 
-def find_test_line_no(test_name: str, test_file_path) -> str:
+def find_test_line_number(test_name: str, test_file_path) -> str:
     """
     Function which finds the correct line number for a test by looking for the "test_marker--[test_name]" string.
     The test_name is split on the "[" character to remove the parameterization information.
@@ -189,5 +183,5 @@ def find_test_line_no(test_name: str, test_file_path) -> str:
         for i, line in enumerate(f):
             if test_file_unique_id in line:
                 return str(i + 1)
-    error_str = f"Test {test_name} not found on any line in {test_file_path}"
+    error_str = f"Test {test_name!r} not found on any line in {test_file_path}"
     raise ValueError(error_str)
