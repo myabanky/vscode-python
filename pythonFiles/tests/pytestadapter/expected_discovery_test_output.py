@@ -1,4 +1,5 @@
 import os
+
 from .helpers import TEST_DATA_PATH, find_test_line_no
 
 # This is the expected output for the empty_discovery.py file.
@@ -441,7 +442,7 @@ doctest_pytest_expected_output = {
         {
             "name": "text_docstring.txt",
             "path": text_docstring_path,
-            "type_": "doc_file",
+            "type_": "file",
             "id_": text_docstring_path,
             "children": [
                 {

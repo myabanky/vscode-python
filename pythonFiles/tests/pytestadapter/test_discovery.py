@@ -3,9 +3,9 @@
 import os
 
 import pytest
-from .helpers import TEST_DATA_PATH
 
 from .expected_discovery_test_output import (
+    doctest_pytest_expected_output,
     double_nested_folder_expected_output,
     dual_level_nested_folder_expected_output,
     empty_discovery_pytest_expected_output,
@@ -13,7 +13,6 @@ from .expected_discovery_test_output import (
     simple_discovery_pytest_expected_output,
     unit_pytest_same_file_discovery_expected_output,
     unittest_folder_discovery_expected_output,
-    doctest_pytest_expected_output,
 )
 from .helpers import TEST_DATA_PATH, runner
 

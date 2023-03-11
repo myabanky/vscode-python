@@ -5,8 +5,6 @@ import sys
 import traceback
 
 import pytest
-from _pytest.doctest import DoctestItem
-from _pytest.nodes import Node
 from testing_tools import socket_manager
 from typing_extensions import Literal
 
@@ -15,7 +13,7 @@ script_dir = pathlib.Path(__file__).parent.parent
 sys.path.append(os.fspath(script_dir))
 sys.path.append(os.fspath(script_dir / "lib" / "python"))
 
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 
 class TestData(Dict):
@@ -25,7 +23,7 @@ class TestData(Dict):
 
     name: str
     path: str
-    type_: Literal["class", "file", "folder", "test", "doc_file"]
+    type_: Literal["class", "file", "folder", "test"]
     id_: str
 
 
@@ -90,54 +88,39 @@ def build_test_tree(session) -> Tuple[Union[TestNode, None], List[str]]:
     errors: List[str] = []
     session_node = create_session_node(session)
     session_children_dict: Dict[str, TestNode] = {}
-    file_nodes_dict: Dict[Node, TestNode] = {}
+    file_nodes_dict: Dict[Any, TestNode] = {}
     class_nodes_dict: Dict[str, TestNode] = {}
 
     for test_case in session.items:
         test_node = create_test_node(test_case)
-        if isinstance(test_case, DoctestItem):
-            if test_case.parent and isinstance(test_case.parent, pytest.Module):
-                try:
-                    parent_test_case = file_nodes_dict[test_case.parent]
-                except KeyError:
-                    parent_test_case = create_doc_file_node(test_case.parent)
-                    file_nodes_dict[test_case.parent] = parent_test_case
-                parent_test_case["children"].append(test_node)
-        elif isinstance(test_case.parent, pytest.Module):
+        if isinstance(test_case.parent, pytest.Class):  # should be a pytest.Class
+            try:
+                test_class_node = class_nodes_dict[test_case.parent.name]
+            except KeyError:
+                test_class_node = create_class_node(test_case.parent)
+                class_nodes_dict[test_case.parent.name] = test_class_node
+            test_class_node["children"].append(test_node)
+            if test_case.parent.parent:
+                parent_module = test_case.parent.parent
+            else:
+                errors.append(f"Test class {test_case.parent} has no parent.")
+                break
+            # Create a file node that has the class as a child.
+            try:
+                test_file_node = file_nodes_dict[parent_module]
+            except KeyError:
+                test_file_node = create_file_node(parent_module)
+                file_nodes_dict[parent_module] = test_file_node
+            # Check if the class is already a child of the file node.
+            if test_class_node not in test_file_node["children"]:
+                test_file_node["children"].append(test_class_node)
+        else:
             try:
                 parent_test_case = file_nodes_dict[test_case.parent]
             except KeyError:
                 parent_test_case = create_file_node(test_case.parent)
                 file_nodes_dict[test_case.parent] = parent_test_case
             parent_test_case["children"].append(test_node)
-        else:  # should be a pytest.Class
-            try:
-                assert isinstance(test_case.parent, pytest.Class)
-            except AssertionError:
-                errors.append(
-                    f"Test case {test_case} has an invalid parent type {type(test_case.parent)}."
-                )
-            else:
-                try:
-                    test_class_node = class_nodes_dict[test_case.parent.name]
-                except KeyError:
-                    test_class_node = create_class_node(test_case.parent)
-                    class_nodes_dict[test_case.parent.name] = test_class_node
-                test_class_node["children"].append(test_node)
-                if test_case.parent.parent:
-                    parent_module: Node = test_case.parent.parent
-                else:
-                    errors.append(f"Test class {test_case.parent} has no parent.")
-                    break
-                # Create a file node that has the class as a child.
-                try:
-                    test_file_node = file_nodes_dict[parent_module]
-                except KeyError:
-                    test_file_node = create_file_node(parent_module)
-                    file_nodes_dict[parent_module] = test_file_node
-                # Check if the class is already a child of the file node.
-                if test_class_node not in test_file_node["children"]:
-                    test_file_node["children"].append(test_class_node)
     created_files_folders_dict: Dict[str, TestNode] = {}
     for file_module, file_node in file_nodes_dict.items():
         # Iterate through all the files that exist and construct them into nested folders.
@@ -153,7 +136,7 @@ def build_test_tree(session) -> Tuple[Union[TestNode, None], List[str]]:
 
 
 def build_nested_folders(
-    file_module: Node,
+    file_module: Any,
     file_node: TestNode,
     created_files_folders_dict: Dict[str, TestNode],
     session: pytest.Session,
@@ -245,7 +228,7 @@ def create_class_node(class_module: pytest.Class) -> TestNode:
     )
 
 
-def create_file_node(file_module: Node) -> TestNode:
+def create_file_node(file_module: Any) -> TestNode:
     """
     Creates a file node from a pytest file module.
 
@@ -257,24 +240,6 @@ def create_file_node(file_module: Node) -> TestNode:
             "name": file_module.path.name,
             "path": os.fspath(file_module.path),
             "type_": "file",
-            "id_": os.fspath(file_module.path),
-            "children": [],
-        }
-    )
-
-
-def create_doc_file_node(file_module: pytest.Module) -> TestNode:
-    """
-    Creates a doc file node from a pytest doc test file module.
-
-    Keyword arguments:
-    file_module -- the module for the doc test file.
-    """
-    return TestNode(
-        {
-            "name": file_module.path.name,
-            "path": os.fspath(file_module.path),
-            "type_": "doc_file",
             "id_": os.fspath(file_module.path),
             "children": [],
         }
