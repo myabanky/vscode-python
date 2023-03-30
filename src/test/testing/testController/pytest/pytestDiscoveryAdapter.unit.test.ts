@@ -20,7 +20,6 @@ suite('pytest test discovery adapter', () => {
     let deferred: Deferred<void>;
     setup(() => {
         testServer = typeMoq.Mock.ofType<ITestServer>();
-        testServer.setup((t) => t.createUUID(typeMoq.It.isAny())).returns(() => 'uuid123');
         testServer.setup((t) => t.getPort()).returns(() => 12345);
         testServer
             .setup((t) => t.onDataReceived(typeMoq.It.isAny(), typeMoq.It.isAny()))
@@ -52,11 +51,14 @@ suite('pytest test discovery adapter', () => {
         execService.setup((p) => ((p as unknown) as any).then).returns(() => undefined);
         console.log(arg);
     });
-    test("onDataReceivedHandler should parse only if cwd matches the test adapter's cwd", async () => {
+    test('onDataReceivedHandler should parse only if known UUID', async () => {
         const uri = Uri.file('/my/test/path/');
+        const uuid = 'uuid123';
         const data = { status: 'success' };
+        testServer.setup((t) => t.createUUID(typeMoq.It.isAny())).returns(() => uuid);
         const eventData = {
             cwd: uri.fsPath,
+            uuid,
             data: JSON.stringify(data),
         };
 
@@ -67,11 +69,14 @@ suite('pytest test discovery adapter', () => {
         const result = await promise;
         assert.deepStrictEqual(result, data);
     });
-    test("onDataReceivedHandler should not parse if cwd doesn't match the test adapter's cwd", async () => {
+    test('onDataReceivedHandler should not parse if it is unknown UUID', async () => {
         const uri = Uri.file('/my/test/path/');
+        const uuid = 'uuid456';
         let data = { status: 'error' };
+        testServer.setup((t) => t.createUUID(typeMoq.It.isAny())).returns(() => uuid);
         const wrongUriEventData = {
             cwd: Uri.file('/other/path').fsPath,
+            uuid: 'incorrect-uuid456',
             data: JSON.stringify(data),
         };
         adapter = new PytestTestDiscoveryAdapter(testServer.object, configService);
@@ -81,37 +86,11 @@ suite('pytest test discovery adapter', () => {
         data = { status: 'success' };
         const correctUriEventData = {
             cwd: uri.fsPath,
+            uuid,
             data: JSON.stringify(data),
         };
         adapter.onDataReceivedHandler(correctUriEventData);
         const result = await promise;
         assert.deepStrictEqual(result, data);
-        // goal to have the right cwd?
     });
-    // test('correct args for discover options', async () => {
-    //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-
-    //     let options: TestCommandOptions | undefined;
-    //     const stubConfigSettings = ({
-    //         getSettings: () => ({
-    //             testing: { unittestArgs: ['-v', '-s', '.', '-p', 'test*'] },
-    //         }),
-    //     } as unknown) as IConfigurationService;
-    //     // testServer
-    //     const stubTestServer = ({
-    //         sendCommand(opt: TestCommandOptions): Promise<void> {
-    //             options = opt;
-    //             return Promise.resolve();
-    //         },
-    //         onDataReceived: () => {
-    //             // no body
-    //         },
-    //     } as unknown) as ITestServer;
-    //     const adapter2 = new PytestTestDiscoveryAdapter(stubTestServer, stubConfigSettings);
-    //     adapter2.discoverTests(Uri.file('/my/test/path/'), execFactory.object);
-    //     assert.deepStrictEqual(options, {
-    //         args: ['.'],
-    //         cwd: '/my/test/path/',
-    //     });
-    // });
 });
