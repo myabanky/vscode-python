@@ -47,6 +47,15 @@ export class PytestTestDiscoveryAdapter implements ITestDiscoveryAdapter {
 
     //     return this.runPytestDiscovery(uri, executionFactory);
     // }
+    // Uncomment this version of the function discoverTests to use the new discovery method.
+    public async discoverTests(uri: Uri, executionFactory: IPythonExecutionFactory): Promise<DiscoveredTestPayload> {
+        const settings = this.configSettings.getSettings(uri);
+        const { pytestArgs } = settings.testing;
+        traceVerbose(pytestArgs);
+
+        this.cwd = uri.fsPath;
+        return this.runPytestDiscovery(uri, executionFactory);
+    }
 
     async runPytestDiscovery(uri: Uri, executionFactory: IPythonExecutionFactory): Promise<DiscoveredTestPayload> {
         const deferred = createDeferred<DiscoveredTestPayload>();
