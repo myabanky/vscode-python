@@ -5,8 +5,6 @@ import sys
 import traceback
 
 import pytest
-from testing_tools import socket_manager
-from typing_extensions import Literal
 
 DEFAULT_PORT = "45454"
 script_dir = pathlib.Path(__file__).parent.parent
@@ -14,6 +12,13 @@ sys.path.append(os.fspath(script_dir))
 sys.path.append(os.fspath(script_dir / "lib" / "python"))
 
 from typing import Any, Dict, List, Optional, Tuple, Union
+
+import debugpy
+from testing_tools import socket_manager
+from typing_extensions import Literal
+
+debugpy.connect(5678)
+breakpoint()
 
 
 class TestData(Dict):
