@@ -44,20 +44,16 @@ export class UnittestTestDiscoveryAdapter implements ITestDiscoveryAdapter {
 
         this.cwd = uri.fsPath;
         const uuid = this.testServer.createUUID(uri.fsPath);
+        this.promiseMap.set(uuid, deferred);
 
         const options: TestCommandOptions = {
             workspaceFolder: uri,
             command,
             cwd: this.cwd,
-            uuid,
         };
-
-        this.promiseMap.set(uuid, deferred);
-
         // Send the test command to the server.
         // The server will fire an onDataReceived event once it gets a response.
         this.testServer.sendCommand(options);
-
         return deferred.promise;
     }
 }

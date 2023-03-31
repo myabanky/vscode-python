@@ -14,8 +14,6 @@ import { DataReceivedEvent, ExecutionTestPayload, ITestExecutionAdapter, ITestSe
 export class PytestTestExecutionAdapter implements ITestExecutionAdapter {
     private promiseMap: Map<string, Deferred<ExecutionTestPayload | undefined>> = new Map();
 
-    private deferred: Deferred<ExecutionTestPayload> | undefined;
-
     constructor(public testServer: ITestServer, public configSettings: IConfigurationService) {
         testServer.onDataReceived(this.onDataReceivedHandler, this);
     }
