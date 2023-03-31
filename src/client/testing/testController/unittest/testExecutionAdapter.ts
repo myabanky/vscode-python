@@ -37,7 +37,6 @@ export class UnittestTestExecutionAdapter implements ITestExecutionAdapter {
     }
 
     public async runTests(uri: Uri, testIds: string[], debugBool?: boolean): Promise<ExecutionTestPayload> {
-        const deferred = createDeferred<ExecutionTestPayload>();
         const settings = this.configSettings.getSettings(uri);
         const { unittestArgs } = settings.testing;
 
@@ -54,6 +53,7 @@ export class UnittestTestExecutionAdapter implements ITestExecutionAdapter {
             testIds,
         };
 
+        const deferred = createDeferred<ExecutionTestPayload>();
         this.promiseMap.set(uuid, deferred);
 
         // send test command to server

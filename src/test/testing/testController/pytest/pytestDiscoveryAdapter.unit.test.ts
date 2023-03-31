@@ -6,7 +6,7 @@ import { Uri } from 'vscode';
 import * as typeMoq from 'typemoq';
 import { IConfigurationService } from '../../../../client/common/types';
 import { PytestTestDiscoveryAdapter } from '../../../../client/testing/testController/pytest/pytestDiscoveryAdapter';
-import { ITestServer } from '../../../../client/testing/testController/common/types';
+import { DataReceivedEvent, ITestServer } from '../../../../client/testing/testController/common/types';
 import { IPythonExecutionFactory, IPythonExecutionService } from '../../../../client/common/process/types';
 import { createDeferred, Deferred } from '../../../../client/common/utils/async';
 
@@ -39,25 +39,21 @@ suite('pytest test discovery adapter', () => {
             .setup((x) => x.createActivatedEnvironment(typeMoq.It.isAny()))
             .returns(() => Promise.resolve(execService.object));
         deferred = createDeferred();
-        let arg;
         execService
             .setup((x) => x.exec(typeMoq.It.isAny(), typeMoq.It.isAny()))
             .returns(() => {
                 deferred.resolve();
-                arg = typeMoq.It.isAny();
                 return Promise.resolve({ stdout: '{}' });
             });
         execFactory.setup((p) => ((p as unknown) as any).then).returns(() => undefined);
         execService.setup((p) => ((p as unknown) as any).then).returns(() => undefined);
-        console.log(arg);
     });
     test('onDataReceivedHandler should parse only if known UUID', async () => {
         const uri = Uri.file('/my/test/path/');
         const uuid = 'uuid123';
         const data = { status: 'success' };
         testServer.setup((t) => t.createUUID(typeMoq.It.isAny())).returns(() => uuid);
-        const eventData = {
-            cwd: uri.fsPath,
+        const eventData: DataReceivedEvent = {
             uuid,
             data: JSON.stringify(data),
         };
@@ -74,8 +70,7 @@ suite('pytest test discovery adapter', () => {
         const uuid = 'uuid456';
         let data = { status: 'error' };
         testServer.setup((t) => t.createUUID(typeMoq.It.isAny())).returns(() => uuid);
-        const wrongUriEventData = {
-            cwd: Uri.file('/other/path').fsPath,
+        const wrongUriEventData: DataReceivedEvent = {
             uuid: 'incorrect-uuid456',
             data: JSON.stringify(data),
         };
@@ -84,8 +79,7 @@ suite('pytest test discovery adapter', () => {
         adapter.onDataReceivedHandler(wrongUriEventData);
 
         data = { status: 'success' };
-        const correctUriEventData = {
-            cwd: uri.fsPath,
+        const correctUriEventData: DataReceivedEvent = {
             uuid,
             data: JSON.stringify(data),
         };
