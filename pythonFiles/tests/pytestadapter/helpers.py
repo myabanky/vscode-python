@@ -10,93 +10,71 @@ import subprocess
 import sys
 import threading
 import uuid
-from typing import Dict, List, Sequence, Union
+from typing import Dict, List, Union
 
 TEST_DATA_PATH = pathlib.Path(__file__).parent / ".data"
+from typing_extensions import TypedDict
 
 
-def create_server(host="127.0.0.1", port=0, backlog=socket.SOMAXCONN, timeout=None):
+def create_server(
+    host: str = "127.0.0.1",
+    port: int = 0,
+    backlog: int = socket.SOMAXCONN,
+    timeout: int = None,
+) -> socket.socket:
     """Return a local server socket listening on the given port."""
-
-    try:
-        server = _new_sock()
-        if port:
-            # If binding to a specific port, make sure that the user doesn't have
-            # to wait until the OS times out waiting for socket in order to use
-            # that port again if the server or the adapter crash or are force-killed.
-            if sys.platform == "win32":
-                server.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
-            else:
-                try:
-                    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                except (AttributeError, OSError):
-                    pass  # Not available everywhere
-        server.bind((host, port))
-        if timeout:
-            server.settimeout(timeout)
-        server.listen(backlog)
-    except Exception:
-        # server.close()
-        raise
+    server: socket.socket = _new_sock()
+    if port:
+        # If binding to a specific port, make sure that the user doesn't have
+        # to wait until the OS times out waiting for socket in order to use
+        # that port again if the server or the adapter crash or are force-killed.
+        if sys.platform == "win32":
+            server.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        else:
+            try:
+                server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            except (AttributeError, OSError):
+                pass  # Not available everywhere
+    server.bind((host, port))
+    if timeout:
+        server.settimeout(timeout)
+    server.listen(backlog)
     return server
 
 
-def create_client():
-    """Return a client socket that may be connected to a remote address."""
-    return _new_sock()
+def _new_sock() -> socket.socket:
+    sock: socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
+    options = [
+        ("SOL_SOCKET", "SO_KEEPALIVE", 1),
+        ("IPPROTO_TCP", "TCP_KEEPIDLE", 1),
+        ("IPPROTO_TCP", "TCP_KEEPINTVL", 3),
+        ("IPPROTO_TCP", "TCP_KEEPCNT", 5),
+    ]
 
+    for level, name, value in options:
+        try:
+            sock.setsockopt(getattr(socket, level), getattr(socket, name), value)
+        except (AttributeError, OSError):
+            pass  # May not be available everywhere.
 
-def _new_sock():
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
-
-    # Set TCP keepalive on an open socket.
-    # It activates after 1 second (TCP_KEEPIDLE,) of idleness,
-    # then sends a keepalive ping once every 3 seconds (TCP_KEEPINTVL),
-    # and closes the connection after 5 failed ping (TCP_KEEPCNT), or 15 seconds
-    try:
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
-    except (AttributeError, OSError):
-        pass  # May not be available everywhere.
-    try:
-        sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 1)  # type: ignore
-    except (AttributeError, OSError):
-        pass  # May not be available everywhere.
-    try:
-        sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 3)
-    except (AttributeError, OSError):
-        pass  # May not be available everywhere.
-    try:
-        sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 5)
-    except (AttributeError, OSError):
-        pass  # May not be available everywhere.
     return sock
 
 
-def shut_down(sock, how=socket.SHUT_RDWR):
-    """Shut down the given socket."""
-    sock.shutdown(how)
-
-
-def close_socket(sock):
-    """Shutdown and close the socket."""
-    try:
-        shut_down(sock)
-    except Exception:
-        pass
-    sock.close()
-
-
-CONTENT_LENGTH = "Content-Length:"
+CONTENT_LENGTH: str = "Content-Length:"
+Env_Dict = TypedDict(
+    "Env_Dict", {"TEST_UUID": str, "TEST_PORT": str, "PYTHONPATH": str}
+)
 
 
 def process_rpc_json(data: str) -> Dict[str, str]:
-    str_stream = io.StringIO(data)
+    """Process the JSON data which comes from the server which runs the pytest discovery."""
+    str_stream: io.StringIO = io.StringIO(data)
 
-    length = None
+    length: int = None
 
     while True:
-        line = str_stream.readline()
-        if line.startswith(CONTENT_LENGTH):
+        line: str = str_stream.readline()
+        if CONTENT_LENGTH.lower() in line.lower():
             length = int(line[len(CONTENT_LENGTH) :])
             break
 
@@ -104,16 +82,17 @@ def process_rpc_json(data: str) -> Dict[str, str]:
             raise ValueError("Header does not contain Content-Length")
 
     while True:
-        line = str_stream.readline()
+        line: str = str_stream.readline()
         if not line or line.isspace():
             break
 
-    raw_json = str_stream.read(length)
+    raw_json: str = str_stream.read(length)
     return json.loads(raw_json)
 
 
 def runner(args: List[str]) -> Union[Dict[str, str], None]:
-    process_args = [
+    """Run the pytest discovery and return the JSON data from the server."""
+    process_args: list[str] = [
         sys.executable,
         "-m",
         "pytest",
@@ -121,22 +100,28 @@ def runner(args: List[str]) -> Union[Dict[str, str], None]:
         "vscode_pytest",
     ] + args
 
-    listener = create_server()
+    listener: socket.socket = create_server()
     _, port = listener.getsockname()
     listener.listen()
 
-    env = {
+    env: Env_Dict = {
         "TEST_UUID": str(uuid.uuid4()),
         "TEST_PORT": str(port),
         "PYTHONPATH": os.fspath(pathlib.Path(__file__).parent.parent.parent),
     }
 
-    result = []
-    t1 = threading.Thread(target=listen_on_socket, args=(listener, result))
+    result: list = []
+    t1: threading.Thread = threading.Thread(
+        target=_listen_on_socket, args=(listener, result)
+    )
     t1.start()
 
-    t2 = threading.Thread(
-        target=subprocess_run_task,
+    t2: threading.Thread = threading.Thread(
+        target=subprocess.run(
+            process_args,
+            env=env,
+            cwd=TEST_DATA_PATH,
+        ),
         args=(process_args, env),
     )
     t2.start()
@@ -147,41 +132,34 @@ def runner(args: List[str]) -> Union[Dict[str, str], None]:
     return process_rpc_json(result[0]) if result else None
 
 
-def subprocess_run_task(process_args: Sequence[str], env: Dict[str, str]):
-    subprocess.run(
-        process_args,
-        env=env,
-        cwd=os.fspath(TEST_DATA_PATH),
-    )
+def _listen_on_socket(listener: socket.socket, result: List[str]):
+    """Listen on the socket for the JSON data from the server.
 
-
-def listen_on_socket(listener: socket.socket, result: List[str]):
+    Created as a seperate function for clarity in threading.
+    """
     sock, (other_host, other_port) = listener.accept()
-    all_data = []
+    all_data: list = []
     while True:
-        data = sock.recv(1024 * 1024)
+        data: bytes = sock.recv(1024 * 1024)
         if not data:
             break
         all_data.append(data.decode("utf-8"))
     result.append("".join(all_data))
 
 
-# dual_level_nested_folder/nested_folder_one/test_bottom_folder.py::test_bottom_function_f
-
-
 def find_test_line_number(test_name: str, test_file_path) -> str:
-    """
-    Function which finds the correct line number for a test by looking for the "test_marker--[test_name]" string.
+    """Function which finds the correct line number for a test by looking for the "test_marker--[test_name]" string.
+
     The test_name is split on the "[" character to remove the parameterization information.
 
     Args:
     test_name: The name of the test to find the line number for, will be unique per file.
     test_file_path: The path to the test file where the test is located.
     """
-    test_file_unique_id = "test_marker--" + test_name.split("[")[0]
+    test_file_unique_id: str = "test_marker--" + test_name.split("[")[0]
     with open(test_file_path) as f:
         for i, line in enumerate(f):
             if test_file_unique_id in line:
                 return str(i + 1)
-    error_str = f"Test {test_name!r} not found on any line in {test_file_path}"
+    error_str: str = f"Test {test_name!r} not found on any line in {test_file_path}"
     raise ValueError(error_str)

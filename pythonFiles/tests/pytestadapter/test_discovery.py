@@ -1,67 +1,89 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 import os
+import shutil
+import signal
 
 import pytest
 
-from .expected_discovery_test_output import (
-    doctest_pytest_expected_output,
-    double_nested_folder_expected_output,
-    dual_level_nested_folder_expected_output,
-    empty_discovery_pytest_expected_output,
-    parametrize_tests_expected_output,
-    simple_discovery_pytest_expected_output,
-    unit_pytest_same_file_discovery_expected_output,
-    unittest_folder_discovery_expected_output,
-)
+from . import expected_discovery_test_output
 from .helpers import TEST_DATA_PATH, runner
 
 
-@pytest.mark.parametrize(
-    "file, expected_error_num",
-    [("error_parametrize_discovery.py", 1), ("error_syntax_discovery.txt", 1)],
-)
-def test_error_collect(file, expected_error_num):
-    """
-    Tests pytest discovery on specific files that are expected to return errors.
+def test_syntax_error(tmp_path):
+    """Test pytest discovery on a file that has a syntax error.
+
+    Copies the contents of a .txt file to a .py file in the temporary directory
+    to then run pytest discovery on.
+
     The json should still be returned but the errors list should be present.
+
+    Keyword arguments:
+    tmp_path -- pytest fixture that creates a temporary directory.
     """
-    rename = False
-    py_name = ""
-    original_name = ""
-    # Saving some files as .txt to avoid that file displaying an error and
-    # just rename it before running this test in order to test the error handling.
-    if file.endswith(".txt"):
-        py_name = os.fspath(TEST_DATA_PATH / file[:-4]) + ".py"
-        original_name = os.fspath(TEST_DATA_PATH / file)
-        os.rename(original_name, py_name)
-        file = py_name
-        rename = True
-    actual = runner(["--collect-only", os.fspath(TEST_DATA_PATH / file)])
+    # Saving some files as .txt to avoid that file displaying a syntax error for
+    # the extension as a whole. Instead just rename it before running this test
+    # in order to test the error handling.
+    file_path = TEST_DATA_PATH / "error_syntax_discovery.txt"
+    temp_dir = tmp_path / "temp_data"
+    temp_dir.mkdir()
+    p = temp_dir / "error_syntax_discovery.py"
+    shutil.copyfile(file_path, p)
+    actual = runner(["--collect-only", p])
     assert actual
     assert actual.get("status") == "error"
     assert actual.get("cwd") == os.fspath(TEST_DATA_PATH)
-    assert len(actual.get("errors", [])) == expected_error_num
-    if rename:
-        os.rename(py_name, original_name)
+    assert len(actual.get("errors", [])) == 1
 
 
-# For the following tests, the expected output includes the line number that the test is on.
-# Therefore if the test file is changed (lines are added or deleted), the expected output will need to be updated to match.
+def test_parameterized_error_collect():
+    """Tests pytest discovery on specific file that incorrectly uses parametrize.
+
+    The json should still be returned but the errors list should be present.
+    """
+    file_path_str = "error_parametrize_discovery.py"
+    actual = runner(["--collect-only", file_path_str])
+    assert actual
+    assert actual.get("status") == "error"
+    assert actual.get("cwd") == os.fspath(TEST_DATA_PATH)
+    assert len(actual.get("errors", [])) == 1
+
+
 @pytest.mark.parametrize(
     "file, expected_const",
     [
-        ("parametrize_tests.py", parametrize_tests_expected_output),
-        ("empty_discovery.py", empty_discovery_pytest_expected_output),
-        ("simple_pytest.py", simple_discovery_pytest_expected_output),
+        (
+            "parametrize_tests.py",
+            expected_discovery_test_output.parametrize_tests_expected_output,
+        ),
+        (
+            "empty_discovery.py",
+            expected_discovery_test_output.empty_discovery_pytest_expected_output,
+        ),
+        (
+            "simple_pytest.py",
+            expected_discovery_test_output.simple_discovery_pytest_expected_output,
+        ),
         (
             "unittest_pytest_same_file.py",
-            unit_pytest_same_file_discovery_expected_output,
+            expected_discovery_test_output.unit_pytest_same_file_discovery_expected_output,
         ),
-        ("unittest_folder", unittest_folder_discovery_expected_output),
-        ("dual_level_nested_folder", dual_level_nested_folder_expected_output),
-        ("double_nested_folder", double_nested_folder_expected_output),
-        ("text_docstring.txt", doctest_pytest_expected_output),
+        (
+            "unittest_folder",
+            expected_discovery_test_output.unittest_folder_discovery_expected_output,
+        ),
+        (
+            "dual_level_nested_folder",
+            expected_discovery_test_output.dual_level_nested_folder_expected_output,
+        ),
+        (
+            "double_nested_folder",
+            expected_discovery_test_output.double_nested_folder_expected_output,
+        ),
+        (
+            "text_docstring.txt",
+            expected_discovery_test_output.doctest_pytest_expected_output,
+        ),
     ],
 )
 def test_pytest_collect(file, expected_const):
@@ -70,6 +92,10 @@ def test_pytest_collect(file, expected_const):
     Uses variables from expected_discovery_test_output.py to store the expected dictionary return.
     Only handles discovery and therefore already contains the arg --collect-only.
     All test discovery will succeed, be in the correct cwd, and match expected test output.
+
+    Keyword arguments:
+    file -- a string with the file or folder to run pytest discovery on.
+    expected_const -- the expected output from running pytest discovery on the file.
     """
     actual = runner(
         [

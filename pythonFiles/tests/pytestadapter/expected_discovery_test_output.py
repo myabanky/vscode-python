@@ -1,6 +1,6 @@
 import os
 
-from .helpers import TEST_DATA_PATH, find_test_line_no
+from .helpers import TEST_DATA_PATH, find_test_line_number
 
 # This is the expected output for the empty_discovery.py file.
 # └──
@@ -31,7 +31,7 @@ simple_discovery_pytest_expected_output = {
                 {
                     "name": "test_function",
                     "path": simple_test_file_path,
-                    "lineno": find_test_line_no(
+                    "lineno": find_test_line_number(
                         "test_function",
                         simple_test_file_path,
                     ),
@@ -50,7 +50,6 @@ simple_discovery_pytest_expected_output = {
 #   ├── TestExample
 #   │   └── test_true_unittest
 #   └── test_true_pytest
-
 unit_pytest_same_file_path = f"{TEST_DATA_PATH_STR}/unittest_pytest_same_file.py"
 unit_pytest_same_file_discovery_expected_output = {
     "name": ".data",
@@ -71,7 +70,7 @@ unit_pytest_same_file_discovery_expected_output = {
                         {
                             "name": "test_true_unittest",
                             "path": unit_pytest_same_file_path,
-                            "lineno": find_test_line_no(
+                            "lineno": find_test_line_number(
                                 "test_true_unittest",
                                 unit_pytest_same_file_path,
                             ),
@@ -85,7 +84,7 @@ unit_pytest_same_file_discovery_expected_output = {
                 {
                     "name": "test_true_pytest",
                     "path": unit_pytest_same_file_path,
-                    "lineno": find_test_line_no(
+                    "lineno": find_test_line_number(
                         "test_true_pytest",
                         unit_pytest_same_file_path,
                     ),
@@ -109,7 +108,6 @@ unit_pytest_same_file_discovery_expected_output = {
 #        └── TestSubtractFunction
 #            ├── test_subtract_negative_numbers
 #            └── test_subtract_positive_numbers
-
 unittest_folder_path = f"{TEST_DATA_PATH_STR}/unittest_folder"
 test_add_path = f"{TEST_DATA_PATH_STR}/unittest_folder/test_add.py"
 test_subtract_path = f"{TEST_DATA_PATH_STR}/unittest_folder/test_subtract.py"
@@ -138,7 +136,7 @@ unittest_folder_discovery_expected_output = {
                                 {
                                     "name": "test_add_negative_numbers",
                                     "path": test_add_path,
-                                    "lineno": find_test_line_no(
+                                    "lineno": find_test_line_number(
                                         "test_add_negative_numbers",
                                         test_add_path,
                                     ),
@@ -149,7 +147,7 @@ unittest_folder_discovery_expected_output = {
                                 {
                                     "name": "test_add_positive_numbers",
                                     "path": test_add_path,
-                                    "lineno": find_test_line_no(
+                                    "lineno": find_test_line_number(
                                         "test_add_positive_numbers",
                                         test_add_path,
                                     ),
@@ -176,7 +174,7 @@ unittest_folder_discovery_expected_output = {
                                 {
                                     "name": "test_subtract_negative_numbers",
                                     "path": test_subtract_path,
-                                    "lineno": find_test_line_no(
+                                    "lineno": find_test_line_number(
                                         "test_subtract_negative_numbers",
                                         test_subtract_path,
                                     ),
@@ -187,7 +185,7 @@ unittest_folder_discovery_expected_output = {
                                 {
                                     "name": "test_subtract_positive_numbers",
                                     "path": test_subtract_path,
-                                    "lineno": find_test_line_no(
+                                    "lineno": find_test_line_number(
                                         "test_subtract_positive_numbers",
                                         test_subtract_path,
                                     ),
@@ -244,7 +242,7 @@ dual_level_nested_folder_expected_output = {
                         {
                             "name": "test_top_function_t",
                             "path": test_top_folder_path,
-                            "lineno": find_test_line_no(
+                            "lineno": find_test_line_number(
                                 "test_top_function_t",
                                 test_top_folder_path,
                             ),
@@ -255,7 +253,7 @@ dual_level_nested_folder_expected_output = {
                         {
                             "name": "test_top_function_f",
                             "path": test_top_folder_path,
-                            "lineno": find_test_line_no(
+                            "lineno": find_test_line_number(
                                 "test_top_function_f",
                                 test_top_folder_path,
                             ),
@@ -280,7 +278,7 @@ dual_level_nested_folder_expected_output = {
                                 {
                                     "name": "test_bottom_function_t",
                                     "path": test_bottom_folder_path,
-                                    "lineno": find_test_line_no(
+                                    "lineno": find_test_line_number(
                                         "test_bottom_function_t",
                                         test_bottom_folder_path,
                                     ),
@@ -291,7 +289,7 @@ dual_level_nested_folder_expected_output = {
                                 {
                                     "name": "test_bottom_function_f",
                                     "path": test_bottom_folder_path,
-                                    "lineno": find_test_line_no(
+                                    "lineno": find_test_line_number(
                                         "test_bottom_function_f",
                                         test_bottom_folder_path,
                                     ),
@@ -355,7 +353,7 @@ double_nested_folder_expected_output = {
                                         {
                                             "name": "test_function",
                                             "path": double_nested_test_nest_path,
-                                            "lineno": find_test_line_no(
+                                            "lineno": find_test_line_number(
                                                 "test_function",
                                                 double_nested_test_nest_path,
                                             ),
@@ -395,7 +393,7 @@ parametrize_tests_expected_output = {
                 {
                     "name": "test_adding[3+5-8]",
                     "path": parameterize_tests_path,
-                    "lineno": find_test_line_no(
+                    "lineno": find_test_line_number(
                         "test_adding[3+5-8]",
                         parameterize_tests_path,
                     ),
@@ -406,7 +404,7 @@ parametrize_tests_expected_output = {
                 {
                     "name": "test_adding[2+4-6]",
                     "path": parameterize_tests_path,
-                    "lineno": find_test_line_no(
+                    "lineno": find_test_line_number(
                         "test_adding[2+4-6]",
                         parameterize_tests_path,
                     ),
@@ -417,7 +415,7 @@ parametrize_tests_expected_output = {
                 {
                     "name": "test_adding[6+9-16]",
                     "path": parameterize_tests_path,
-                    "lineno": find_test_line_no(
+                    "lineno": find_test_line_number(
                         "test_adding[6+9-16]",
                         parameterize_tests_path,
                     ),
@@ -448,7 +446,7 @@ doctest_pytest_expected_output = {
                 {
                     "name": "text_docstring.txt",
                     "path": text_docstring_path,
-                    "lineno": find_test_line_no(
+                    "lineno": find_test_line_number(
                         "text_docstring.txt",
                         text_docstring_path,
                     ),

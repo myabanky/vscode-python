@@ -6,22 +6,18 @@ import traceback
 
 import pytest
 
-DEFAULT_PORT = "45454"
 script_dir = pathlib.Path(__file__).parent.parent
 sys.path.append(os.fspath(script_dir))
 sys.path.append(os.fspath(script_dir / "lib" / "python"))
 
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
-import debugpy
 from testing_tools import socket_manager
-from typing_extensions import Literal
+from typing_extensions import Literal, TypedDict
 
 
-class TestData(Dict):
-    """
-    A general class that all test objects inherit from.
-    """
+class TestData(TypedDict):
+    """A general class that all test objects inherit from."""
 
     name: str
     path: str
@@ -30,18 +26,14 @@ class TestData(Dict):
 
 
 class TestItem(TestData):
-    """
-    A class defining test items.
-    """
+    """A class defining test items."""
 
     lineno: str
     runID: str
 
 
 class TestNode(TestData):
-    """
-    A general class that handles all test data which contains children.
-    """
+    """A general class that handles all test data which contains children."""
 
     children: "List[Union[TestNode, TestItem]]"
 
@@ -62,8 +54,7 @@ def pytest_keyboard_interrupt(excinfo):
 
 
 def pytest_sessionfinish(session, exitstatus):
-    """
-    A pytest hook that is called after pytest has fulled finished.
+    """A pytest hook that is called after pytest has fulled finished.
 
     Keyword arguments:
     session -- the pytest session object.
@@ -80,18 +71,17 @@ def pytest_sessionfinish(session, exitstatus):
         post_response(os.fsdecode(cwd), TestNode(), errors)
 
 
-def build_test_tree(session) -> Tuple[Union[TestNode, None], List[str]]:
-    """
-    Builds a tree made up of testing nodes from the pytest session.
+def build_test_tree(session: pytest.Session) -> Tuple[Union[TestNode, None], List[str]]:
+    """Builds a tree made up of testing nodes from the pytest session.
 
     Keyword arguments:
     session -- the pytest session object.
     """
     errors: List[str] = []
     session_node = create_session_node(session)
-    session_children_dict: Dict[str, TestNode] = {}
-    file_nodes_dict: Dict[Any, TestNode] = {}
-    class_nodes_dict: Dict[str, TestNode] = {}
+    session_children_dict: TypedDict[str, TestNode] = {}
+    file_nodes_dict: TypedDict[Any, TestNode] = {}
+    class_nodes_dict: TypedDict[str, TestNode] = {}
 
     for test_case in session.items:
         test_node = create_test_node(test_case)
@@ -123,7 +113,7 @@ def build_test_tree(session) -> Tuple[Union[TestNode, None], List[str]]:
                 parent_test_case = create_file_node(test_case.parent)
                 file_nodes_dict[test_case.parent] = parent_test_case
             parent_test_case["children"].append(test_node)
-    created_files_folders_dict: Dict[str, TestNode] = {}
+    created_files_folders_dict: TypedDict[str, TestNode] = {}
     for file_module, file_node in file_nodes_dict.items():
         # Iterate through all the files that exist and construct them into nested folders.
         root_folder_node: TestNode = build_nested_folders(
@@ -140,11 +130,10 @@ def build_test_tree(session) -> Tuple[Union[TestNode, None], List[str]]:
 def build_nested_folders(
     file_module: Any,
     file_node: TestNode,
-    created_files_folders_dict: Dict[str, TestNode],
+    created_files_folders_dict: TypedDict[str, TestNode],
     session: pytest.Session,
 ) -> TestNode:
-    """
-    Takes a file or folder and builds the nested folder structure for it.
+    """Takes a file or folder and builds the nested folder structure for it.
 
     Keyword arguments:
     file_module -- the created module for the file we  are nesting.
@@ -173,14 +162,13 @@ def build_nested_folders(
 def create_test_node(
     test_case: pytest.Item,
 ) -> TestItem:
-    """
-    Creates a test node from a pytest test case.
+    """Creates a test node from a pytest test case.
 
     Keyword arguments:
     test_case -- the pytest test case.
     """
     test_case_loc: str = (
-        "" if test_case.location[1] is None else str(test_case.location[1] + 1)
+        str(test_case.location[1] + 1) if (test_case.location[1] is not None) else ""
     )
     return TestItem(
         {
@@ -195,8 +183,7 @@ def create_test_node(
 
 
 def create_session_node(session: pytest.Session) -> TestNode:
-    """
-    Creates a session node from a pytest session.
+    """Creates a session node from a pytest session.
 
     Keyword arguments:
     session -- the pytest session.
@@ -213,8 +200,7 @@ def create_session_node(session: pytest.Session) -> TestNode:
 
 
 def create_class_node(class_module: pytest.Class) -> TestNode:
-    """
-    Creates a class node from a pytest class object.
+    """Creates a class node from a pytest class object.
 
     Keyword arguments:
     class_module -- the pytest object representing a class module.
@@ -231,8 +217,7 @@ def create_class_node(class_module: pytest.Class) -> TestNode:
 
 
 def create_file_node(file_module: Any) -> TestNode:
-    """
-    Creates a file node from a pytest file module.
+    """Creates a file node from a pytest file module.
 
     Keyword arguments:
     file_module -- the pytest file module.
@@ -249,8 +234,7 @@ def create_file_node(file_module: Any) -> TestNode:
 
 
 def create_folder_node(folderName: str, path_iterator: pathlib.Path) -> TestNode:
-    """
-    Creates a folder node from a pytest folder name and its path.
+    """Creates a folder node from a pytest folder name and its path.
 
     Keyword arguments:
     folderName -- the name of the folder.
@@ -267,10 +251,8 @@ def create_folder_node(folderName: str, path_iterator: pathlib.Path) -> TestNode
     )
 
 
-class PayloadDict(Dict):
-    """
-    A dictionary that is used to send a post request to the server.
-    """
+class PayloadDict(TypedDict):
+    """A dictionary that is used to send a post request to the server."""
 
     cwd: str
     status: Literal["success", "error"]
@@ -279,19 +261,20 @@ class PayloadDict(Dict):
 
 
 def post_response(cwd: str, session_node: TestNode, errors: List[str]) -> None:
-    """
-    Sends a post request to the server.
+    """Sends a post request to the server.
+
     Keyword arguments:
     cwd -- the current working directory.
     session_node -- the session node, which is the top of the testing tree.
     errors -- a list of errors that occurred during test collection.
     """
+    payload: PayloadDict = {
+        "cwd": cwd,
+        "tests": session_node,
+        "status": "success" if not errors else "error",
+    }
     if errors:
-        payload = PayloadDict(
-            {"cwd": cwd, "status": "error", "tests": session_node, "errors": errors}
-        )
-    else:
-        payload = PayloadDict({"cwd": cwd, "status": "success", "tests": session_node})
+        payload["errors"] = errors
 
     testPort: Union[str, int] = os.getenv("TEST_PORT", 45454)
     testuuid: Union[str, None] = os.getenv("TEST_UUID")
