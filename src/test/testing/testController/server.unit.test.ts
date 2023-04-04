@@ -171,7 +171,7 @@ Request-uuid: xxxxxx-1012-xxxx-xxxx-xxx
             extractedData: `{"cwd": "/path/to/folder", "status": "success", "tests": {"name": "test", "path": "/path/to/test", "type_": "folder", "children": []}], "id_": "/path/to/test"}}`,
             remainingRawData: '',
         };
-        const output: IJSONRPCMessage = jsonRPCProcessor(rawDataString);
+        const output = jsonRPCProcessor(rawDataString);
         assert.deepStrictEqual(output, expected);
     });
 });
