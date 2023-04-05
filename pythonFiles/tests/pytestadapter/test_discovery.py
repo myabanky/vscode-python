@@ -31,9 +31,10 @@ def test_syntax_error(tmp_path):
     shutil.copyfile(file_path, p)
     actual = runner(["--collect-only", p])
     assert actual
-    assert actual.get("status") == "error"
-    assert actual.get("cwd") == os.fspath(TEST_DATA_PATH)
-    assert len(actual.get("errors", [])) == 1
+    assert all(item in actual for item in ("status", "cwd", "errors"))
+    assert actual["status"] == "error"
+    assert actual["cwd"] == os.fspath(TEST_DATA_PATH)
+    assert len(actual["errors"]) == 1
 
 
 def test_parameterized_error_collect():
@@ -44,9 +45,10 @@ def test_parameterized_error_collect():
     file_path_str = "error_parametrize_discovery.py"
     actual = runner(["--collect-only", file_path_str])
     assert actual
-    assert actual.get("status") == "error"
-    assert actual.get("cwd") == os.fspath(TEST_DATA_PATH)
-    assert len(actual.get("errors", [])) == 1
+    assert all(item in actual for item in ("status", "cwd", "errors"))
+    assert actual["status"] == "error"
+    assert actual["cwd"] == os.fspath(TEST_DATA_PATH)
+    assert len(actual["errors"]) == 1
 
 
 @pytest.mark.parametrize(
@@ -103,8 +105,8 @@ def test_pytest_collect(file, expected_const):
             os.fspath(TEST_DATA_PATH / file),
         ]
     )
-
-    assert actual is not None
-    assert actual.get("status") == "success"
-    assert actual.get("cwd") == os.fspath(TEST_DATA_PATH)
-    assert actual.get("tests") == expected_const
+    assert actual
+    assert all(item in actual for item in ("status", "cwd", "tests"))
+    assert actual["status"] == "success"
+    assert actual["cwd"] == os.fspath(TEST_DATA_PATH)
+    assert actual["tests"] == expected_const
