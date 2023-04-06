@@ -22,7 +22,7 @@ def test_syntax_error(tmp_path):
     tmp_path -- pytest fixture that creates a temporary directory.
     """
     # Saving some files as .txt to avoid that file displaying a syntax error for
-    # the extension as a whole. Instead just rename it before running this test
+    # the extension as a whole. Instead, rename it before running this test
     # in order to test the error handling.
     file_path = TEST_DATA_PATH / "error_syntax_discovery.txt"
     temp_dir = tmp_path / "temp_data"
@@ -34,7 +34,7 @@ def test_syntax_error(tmp_path):
     assert all(item in actual for item in ("status", "cwd", "errors"))
     assert actual["status"] == "error"
     assert actual["cwd"] == os.fspath(TEST_DATA_PATH)
-    assert len(actual["errors"]) == 1
+    assert len(actual["errors"]) == 2
 
 
 def test_parameterized_error_collect():
@@ -48,7 +48,7 @@ def test_parameterized_error_collect():
     assert all(item in actual for item in ("status", "cwd", "errors"))
     assert actual["status"] == "error"
     assert actual["cwd"] == os.fspath(TEST_DATA_PATH)
-    assert len(actual["errors"]) == 1
+    assert len(actual["errors"]) == 2
 
 
 @pytest.mark.parametrize(

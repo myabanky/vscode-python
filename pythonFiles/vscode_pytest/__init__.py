@@ -69,7 +69,7 @@ def pytest_exception_interact(node, call, report):
     """
     # call.excinfo is the captured exception of the call, if it raised as type ExceptionInfo.
     # call.excinfo.exconly() returns the exception as a string.
-    ERRORS.append(call.execinfo.exconly())
+    ERRORS.append(call.excinfo.exconly())
 
 
 def pytest_keyboard_interrupt(excinfo):
@@ -78,7 +78,7 @@ def pytest_keyboard_interrupt(excinfo):
     Keyword arguments:
     excinfo -- the exception information of type ExceptionInfo.
     """
-    # The function execonly() return the exception as a string.
+    # The function execonly() returns the exception as a string.
     ERRORS.append(excinfo.exconly())
 
 
@@ -91,19 +91,18 @@ def pytest_sessionfinish(session, exitstatus):
     """
     cwd = pathlib.Path.cwd()
     try:
-        session_node: Union[TestNode, None] = build_test_tree(session)[0]
+        session_node: Union[TestNode, None] = build_test_tree(session)
         if not session_node:
             raise VSCodePytestError(
                 "Something went wrong following pytest finish, \
                     no session node was created"
             )
-        post_response(os.fsdecode(cwd), session_node, ERRORS)
+        post_response(os.fsdecode(cwd), session_node)
     except Exception as e:
         ERRORS.append(
-            f"Error message: {e.message()}. \
-                Traceback: {(traceback.format_exc() if e.__traceback__ else '')}"
+            f"Error Occurred, traceback: {(traceback.format_exc() if e.__traceback__ else '')}"
         )
-        post_response(os.fsdecode(cwd), TestNode(), ERRORS)
+        post_response(os.fsdecode(cwd), TestNode())
 
 
 def build_test_tree(session: pytest.Session) -> Tuple[Union[TestNode, None], List[str]]:
@@ -112,7 +111,6 @@ def build_test_tree(session: pytest.Session) -> Tuple[Union[TestNode, None], Lis
     Keyword arguments:
     session -- the pytest session object.
     """
-    errors: List[str] = []
     session_node = create_session_node(session)
     session_children_dict: TypedDict[str, TestNode] = {}
     file_nodes_dict: TypedDict[Any, TestNode] = {}
@@ -130,7 +128,7 @@ def build_test_tree(session: pytest.Session) -> Tuple[Union[TestNode, None], Lis
             if test_case.parent.parent:
                 parent_module = test_case.parent.parent
             else:
-                errors.append(f"Test class {test_case.parent} has no parent.")
+                ERRORS.append(f"Test class {test_case.parent} has no parent")
                 break
             # Create a file node that has the class as a child.
             try:
@@ -159,8 +157,8 @@ def build_test_tree(session: pytest.Session) -> Tuple[Union[TestNode, None], Lis
         root_id = root_folder_node.get("id_")
         if root_id and root_id not in session_children_dict:
             session_children_dict[root_id] = root_folder_node
-    session_node["children"] = list(session_children_dict.values())
-    return session_node, errors
+    session_node["children"] = List(session_children_dict.values())
+    return session_node
 
 
 def build_nested_folders(
@@ -296,7 +294,7 @@ class PayloadDict(TypedDict):
     errors: Optional[List[str]]
 
 
-def post_response(cwd: str, session_node: TestNode, errors: List[str]) -> None:
+def post_response(cwd: str, session_node: TestNode) -> None:
     """Sends a post request to the server.
 
     Keyword arguments:
@@ -307,10 +305,10 @@ def post_response(cwd: str, session_node: TestNode, errors: List[str]) -> None:
     payload: PayloadDict = {
         "cwd": cwd,
         "tests": session_node,
-        "status": "success" if not errors else "error",
+        "status": "success" if not ERRORS else "error",
     }
-    if errors:
-        payload["errors"] = errors
+    if ERRORS:
+        payload["errors"] = ERRORS
 
     testPort: Union[str, int] = os.getenv("TEST_PORT", 45454)
     testuuid: Union[str, None] = os.getenv("TEST_UUID")

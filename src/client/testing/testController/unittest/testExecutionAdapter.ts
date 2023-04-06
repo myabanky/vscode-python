@@ -56,8 +56,8 @@ export class UnittestTestExecutionAdapter implements ITestExecutionAdapter {
         const deferred = createDeferred<ExecutionTestPayload>();
         this.promiseMap.set(uuid, deferred);
 
-        // send test command to server
-        // server fire onDataReceived event once it gets response
+        // Send test command to server.
+        // Server fire onDataReceived event once it gets response.
         this.testServer.sendCommand(options);
 
         return deferred.promise;
