@@ -66,7 +66,7 @@ Env_Dict = TypedDict(
 )
 
 
-def process_rpc_json(data: str) -> Dict[str, str]:
+def process_rpc_json(data: str) -> dict[str, str]:
     """Process the JSON data which comes from the server which runs the pytest discovery."""
     str_stream: io.StringIO = io.StringIO(data)
 
@@ -90,7 +90,7 @@ def process_rpc_json(data: str) -> Dict[str, str]:
     return json.loads(raw_json)
 
 
-def runner(args: List[str]) -> Union[Dict[str, str], None]:
+def runner(args: list[str]) -> Union[dict[str, str], None]:
     """Run the pytest discovery and return the JSON data from the server."""
     process_args: list[str] = [
         sys.executable,

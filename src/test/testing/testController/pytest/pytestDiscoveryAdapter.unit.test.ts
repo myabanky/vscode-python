@@ -16,7 +16,6 @@ suite('pytest test discovery adapter', () => {
     let execFactory = typeMoq.Mock.ofType<IPythonExecutionFactory>();
     let adapter: PytestTestDiscoveryAdapter;
     let execService: typeMoq.IMock<IPythonExecutionService>;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let deferred: Deferred<void>;
     setup(() => {
         testServer = typeMoq.Mock.ofType<ITestServer>();

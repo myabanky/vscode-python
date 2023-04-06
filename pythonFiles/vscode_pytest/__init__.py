@@ -95,7 +95,7 @@ def pytest_sessionfinish(session, exitstatus):
         if not session_node:
             raise VSCodePytestError(
                 "Something went wrong following pytest finish, \
-                    no session node was created."
+                    no session node was created"
             )
         post_response(os.fsdecode(cwd), session_node, ERRORS)
     except Exception as e:
@@ -120,7 +120,7 @@ def build_test_tree(session: pytest.Session) -> Tuple[Union[TestNode, None], Lis
 
     for test_case in session.items:
         test_node = create_test_node(test_case)
-        if isinstance(test_case.parent, pytest.Class):  # should be a pytest.Class
+        if isinstance(test_case.parent, pytest.Class):
             try:
                 test_class_node = class_nodes_dict[test_case.parent.name]
             except KeyError:
@@ -141,7 +141,7 @@ def build_test_tree(session: pytest.Session) -> Tuple[Union[TestNode, None], Lis
             # Check if the class is already a child of the file node.
             if test_class_node not in test_file_node["children"]:
                 test_file_node["children"].append(test_class_node)
-        else:
+        else:  # This includes test cases that are pytest functions or a doctests.
             try:
                 parent_test_case = file_nodes_dict[test_case.parent]
             except KeyError:
@@ -154,7 +154,8 @@ def build_test_tree(session: pytest.Session) -> Tuple[Union[TestNode, None], Lis
         root_folder_node: TestNode = build_nested_folders(
             file_module, file_node, created_files_folders_dict, session
         )
-        # The final folder we get to is the highest folder in the path and therefore we add this as a child to the session.
+        # The final folder we get to is the highest folder in the path
+        # and therefore we add this as a child to the session.
         root_id = root_folder_node.get("id_")
         if root_id and root_id not in session_children_dict:
             session_children_dict[root_id] = root_folder_node
@@ -178,7 +179,7 @@ def build_nested_folders(
     """
     prev_folder_node = file_node
 
-    # Begin the i_path iteration one level above the current file.
+    # Begin the iterator_path one level above the current file.
     iterator_path = file_module.path.parent
     while iterator_path != session.path:
         curr_folder_name = iterator_path.name
