@@ -263,7 +263,7 @@
             "type": "python",
             "request": "launch",
             "module": "pytest",
-            "args": ["${workspaceFolder}/pythonFiles/tests/unittestadapter/execution"],
+            "args": ["${workspaceFolder}/pythonFiles/tests/unittestadapter"],
             "justMyCode": true
         }
     ],
