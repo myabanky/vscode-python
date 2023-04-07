@@ -373,29 +373,29 @@ export class PythonTestController implements ITestController, IExtensionSingleAc
                                 debugging: request.profile?.kind === TestRunProfileKind.Debug,
                             });
                             // ** new execution runner/adapter
-                            // const testAdapter =
-                            //     this.testAdapters.get(workspace.uri) ||
-                            //     (this.testAdapters.values().next().value as WorkspaceTestAdapter);
-                            // return testAdapter.executeTests(
-                            //     this.testController,
-                            //     runInstance,
-                            //     testItems,
-                            //     token,
-                            //     request.profile?.kind === TestRunProfileKind.Debug,
-                            //     this.pythonExecFactory,
-                            // );
+                            const testAdapter =
+                                this.testAdapters.get(workspace.uri) ||
+                                (this.testAdapters.values().next().value as WorkspaceTestAdapter);
+                            return testAdapter.executeTests(
+                                this.testController,
+                                runInstance,
+                                testItems,
+                                token,
+                                request.profile?.kind === TestRunProfileKind.Debug,
+                                this.pythonExecFactory,
+                            );
 
                             // below is old way of running pytest execution
-                            return this.pytest.runTests(
-                                {
-                                    includes: testItems,
-                                    excludes: request.exclude ?? [],
-                                    runKind: request.profile?.kind ?? TestRunProfileKind.Run,
-                                    runInstance,
-                                },
-                                workspace,
-                                token,
-                            );
+                            // return this.pytest.runTests(
+                            //     {
+                            //         includes: testItems,
+                            //         excludes: request.exclude ?? [],
+                            //         runKind: request.profile?.kind ?? TestRunProfileKind.Run,
+                            //         runInstance,
+                            //     },
+                            //     workspace,
+                            //     token,
+                            // );
                         }
                         if (settings.testing.unittestEnabled) {
                             // potentially squeeze in the new execution way here?
@@ -404,29 +404,29 @@ export class PythonTestController implements ITestController, IExtensionSingleAc
                                 debugging: request.profile?.kind === TestRunProfileKind.Debug,
                             });
                             // new execution runner/adapter
-                            // const testAdapter =
-                            //     this.testAdapters.get(workspace.uri) ||
-                            //     (this.testAdapters.values().next().value as WorkspaceTestAdapter);
-                            // return testAdapter.executeTests(
-                            //     this.testController,
-                            //     runInstance,
-                            //     testItems,
-                            //     token,
-                            //     request.profile?.kind === TestRunProfileKind.Debug,
-                            // );
+                            const testAdapter =
+                                this.testAdapters.get(workspace.uri) ||
+                                (this.testAdapters.values().next().value as WorkspaceTestAdapter);
+                            return testAdapter.executeTests(
+                                this.testController,
+                                runInstance,
+                                testItems,
+                                token,
+                                request.profile?.kind === TestRunProfileKind.Debug,
+                            );
 
                             // below is old way of running unittest execution
-                            return this.unittest.runTests(
-                                {
-                                    includes: testItems,
-                                    excludes: request.exclude ?? [],
-                                    runKind: request.profile?.kind ?? TestRunProfileKind.Run,
-                                    runInstance,
-                                },
-                                workspace,
-                                token,
-                                this.testController,
-                            );
+                            // return this.unittest.runTests(
+                            //     {
+                            //         includes: testItems,
+                            //         excludes: request.exclude ?? [],
+                            //         runKind: request.profile?.kind ?? TestRunProfileKind.Run,
+                            //         runInstance,
+                            //     },
+                            //     workspace,
+                            //     token,
+                            //     this.testController,
+                            // );
                         }
                     }
 
