@@ -43,7 +43,9 @@ def create_server(
 
 
 def _new_sock() -> socket.socket:
-    sock: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
+    sock: socket.socket = socket.socket(
+        socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP
+    )
     options = [
         ("SOL_SOCKET", "SO_KEEPALIVE", 1),
         ("IPPROTO_TCP", "TCP_KEEPIDLE", 1),
@@ -104,7 +106,7 @@ def runner(args: list[str]) -> Union[dict[str, str], None]:
     _, port = listener.getsockname()
     listener.listen()
 
-    env: Env_Dict = {
+    env = {
         "TEST_UUID": str(uuid.uuid4()),
         "TEST_PORT": str(port),
         "PYTHONPATH": os.fspath(pathlib.Path(__file__).parent.parent.parent),
@@ -116,13 +118,11 @@ def runner(args: list[str]) -> Union[dict[str, str], None]:
     )
     t1.start()
 
-    t2: threading.Thread = threading.Thread(
-        target=subprocess.run(
-            process_args,
-            env=env,
-            cwd=TEST_DATA_PATH,
+    t2 = threading.Thread(
+        target=lambda proc_args, proc_env, proc_cwd: subprocess.run(
+            proc_args, env=proc_env, cwd=proc_cwd
         ),
-        args=(process_args, env),
+        args=(process_args, env, TEST_DATA_PATH),
     )
     t2.start()
 
