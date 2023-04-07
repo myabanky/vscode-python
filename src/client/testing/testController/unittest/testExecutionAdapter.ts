@@ -42,17 +42,18 @@ export class UnittestTestExecutionAdapter implements ITestExecutionAdapter {
 
         const command = buildExecutionCommand(unittestArgs);
         this.cwd = uri.fsPath;
+        const uuid = this.testServer.createUUID(uri.fsPath);
 
         const options: TestCommandOptions = {
             workspaceFolder: uri,
             command,
             cwd: this.cwd,
+            uuid,
             debugBool,
             testIds,
         };
 
         const deferred = createDeferred<ExecutionTestPayload>();
-        const uuid = this.testServer.createUUID(uri.fsPath);
         this.promiseMap.set(uuid, deferred);
 
         // send test command to server

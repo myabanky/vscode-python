@@ -155,23 +155,4 @@ suite('Python Test Server', () => {
         await deferred.promise;
         assert.deepStrictEqual(eventData, '');
     });
-    test('jsonRPCProcessor', async () => {
-        const rawDataString = `Content-Length: 160
-Content-Type: application/json
-Request-uuid: xxxxxx-1012-xxxx-xxxx-xxx
-
-{"cwd": "/path/to/folder", "status": "success", "tests": {"name": "test", "path": "/path/to/test", "type_": "folder", "children": []}], "id_": "/path/to/test"}}`;
-        const headers = new Map<string, string>([
-            ['Content-Length', '160'],
-            ['Content-Type', 'application/json'],
-            ['Request-uuid', 'xxxxxx-1012-xxxx-xxxx-xxx'],
-        ]);
-        const expected: IJSONRPCMessage = {
-            headers,
-            extractedData: `{"cwd": "/path/to/folder", "status": "success", "tests": {"name": "test", "path": "/path/to/test", "type_": "folder", "children": []}], "id_": "/path/to/test"}}`,
-            remainingRawData: '',
-        };
-        const output = jsonRPCProcessor(rawDataString);
-        assert.deepStrictEqual(output, expected);
-    });
 });

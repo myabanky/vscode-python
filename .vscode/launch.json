@@ -160,8 +160,8 @@
                 "--ui=tdd",
                 "--recursive",
                 "--colors",
-                "--grep", "pytest test discovery adapter",
-                // "--grep", "Unittest test discovery adapter", // "discoverTests should send the discovery command to the test server",
+                // "--grep", "Python Test Server",
+                "--grep", "Unittest test discovery adapter", // "discoverTests should send the discovery command to the test server",
                 // "--grep", "onDataReceivedHandler should ignore the data if the cwd from the payload does not match the test adapter's cwd",
                 "--timeout=300000"
             ],
@@ -182,7 +182,7 @@
                 "--ui=tdd",
                 "--recursive",
                 "--colors",
-                // "--grep", "<suite name>",
+                "--grep", "Python Test Server",
                 "--timeout=300000",
                 "--fast"
             ],
@@ -257,14 +257,6 @@
                 "host": "localhost",
                 "port": 5678
             },
-        },
-        {
-            "name": "Pytest Module",
-            "type": "python",
-            "request": "launch",
-            "module": "pytest",
-            "args": [],
-            "justMyCode": true
         },
         {
             "name": "Pytest Module",

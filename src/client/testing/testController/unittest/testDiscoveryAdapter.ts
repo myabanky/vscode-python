@@ -50,6 +50,7 @@ export class UnittestTestDiscoveryAdapter implements ITestDiscoveryAdapter {
             workspaceFolder: uri,
             command,
             cwd: this.cwd,
+            uuid,
         };
         // Send the test command to the server.
         // The server will fire an onDataReceived event once it gets a response.
