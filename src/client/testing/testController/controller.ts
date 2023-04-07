@@ -254,6 +254,7 @@ export class PythonTestController implements ITestController, IExtensionSingleAc
                     this.refreshCancellation.token,
                     this.testAdapters.size > 1,
                     this.workspaceService.workspaceFile?.fsPath,
+                    this.pythonExecFactory,
                 );
                 // uncomment ~260 to use OLD test discovery mechanism
                 // await this.unittest.refreshTestData(this.testController, uri, this.refreshCancellation.token);
@@ -413,6 +414,7 @@ export class PythonTestController implements ITestController, IExtensionSingleAc
                                 testItems,
                                 token,
                                 request.profile?.kind === TestRunProfileKind.Debug,
+                                this.pythonExecFactory,
                             );
 
                             // below is old way of running unittest execution
