@@ -191,7 +191,9 @@ def build_nested_folders(
         try:
             curr_folder_node: TestNode = created_files_folders_dict[curr_folder_name]
         except KeyError:
-            curr_folder_node: TestNode = create_folder_node(curr_folder_name, iterator_path)
+            curr_folder_node: TestNode = create_folder_node(
+                curr_folder_name, iterator_path
+            )
             created_files_folders_dict[curr_folder_name] = curr_folder_node
         if prev_folder_node not in curr_folder_node["children"]:
             curr_folder_node["children"].append(prev_folder_node)
@@ -212,14 +214,13 @@ def create_test_node(
         str(test_case.location[1] + 1) if (test_case.location[1] is not None) else ""
     )
     return {
-            "name": test_case.name,
-            "path": os.fspath(test_case.path),
-            "lineno": test_case_loc,
-            "type_": "test",
-            "id_": test_case.nodeid,
-            "runID": test_case.nodeid,
-        }
-    
+        "name": test_case.name,
+        "path": os.fspath(test_case.path),
+        "lineno": test_case_loc,
+        "type_": "test",
+        "id_": test_case.nodeid,
+        "runID": test_case.nodeid,
+    }
 
 
 def create_session_node(session: pytest.Session) -> TestNode:
@@ -229,13 +230,12 @@ def create_session_node(session: pytest.Session) -> TestNode:
     session -- the pytest session.
     """
     return {
-            "name": session.name,
-            "path": os.fspath(session.path),
-            "type_": "folder",
-            "children": [],
-            "id_": os.fspath(session.path),
-        }
-    
+        "name": session.name,
+        "path": os.fspath(session.path),
+        "type_": "folder",
+        "children": [],
+        "id_": os.fspath(session.path),
+    }
 
 
 def create_class_node(class_module: pytest.Class) -> TestNode:
@@ -245,12 +245,12 @@ def create_class_node(class_module: pytest.Class) -> TestNode:
     class_module -- the pytest object representing a class module.
     """
     return {
-            "name": class_module.name,
-            "path": os.fspath(class_module.path),
-            "type_": "class",
-            "children": [],
-            "id_": class_module.nodeid,
-        }
+        "name": class_module.name,
+        "path": os.fspath(class_module.path),
+        "type_": "class",
+        "children": [],
+        "id_": class_module.nodeid,
+    }
 
 
 def create_file_node(file_module: Any) -> TestNode:
@@ -260,12 +260,12 @@ def create_file_node(file_module: Any) -> TestNode:
     file_module -- the pytest file module.
     """
     return {
-            "name": file_module.path.name,
-            "path": os.fspath(file_module.path),
-            "type_": "file",
-            "id_": os.fspath(file_module.path),
-            "children": [],
-        }
+        "name": file_module.path.name,
+        "path": os.fspath(file_module.path),
+        "type_": "file",
+        "id_": os.fspath(file_module.path),
+        "children": [],
+    }
 
 
 def create_folder_node(folderName: str, path_iterator: pathlib.Path) -> TestNode:
@@ -276,12 +276,12 @@ def create_folder_node(folderName: str, path_iterator: pathlib.Path) -> TestNode
     path_iterator -- the path of the folder.
     """
     return {
-            "name": folderName,
-            "path": os.fspath(path_iterator),
-            "type_": "folder",
-            "id_": os.fspath(path_iterator),
-            "children": [],
-        }
+        "name": folderName,
+        "path": os.fspath(path_iterator),
+        "type_": "folder",
+        "id_": os.fspath(path_iterator),
+        "children": [],
+    }
 
 
 class PayloadDict(TypedDict):
@@ -305,7 +305,7 @@ def post_response(cwd: str, session_node: TestNode) -> None:
         "cwd": cwd,
         "status": "success" if not ERRORS else "error",
         "tests": session_node,
-        "errors": []
+        "errors": [],
     }
     if ERRORS:
         payload["errors"] = ERRORS
