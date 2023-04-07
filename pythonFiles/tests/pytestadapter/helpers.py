@@ -10,7 +10,7 @@ import subprocess
 import sys
 import threading
 import uuid
-from typing import Dict, List, Union
+from typing import List, Union
 
 TEST_DATA_PATH = pathlib.Path(__file__).parent / ".data"
 from typing_extensions import TypedDict
@@ -20,7 +20,7 @@ def create_server(
     host: str = "127.0.0.1",
     port: int = 0,
     backlog: int = socket.SOMAXCONN,
-    timeout: int = None,
+    timeout: int = 1000,
 ) -> socket.socket:
     """Return a local server socket listening on the given port."""
     server: socket.socket = _new_sock()
@@ -43,7 +43,7 @@ def create_server(
 
 
 def _new_sock() -> socket.socket:
-    sock: socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
+    sock: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
     options = [
         ("SOL_SOCKET", "SO_KEEPALIVE", 1),
         ("IPPROTO_TCP", "TCP_KEEPIDLE", 1),
@@ -70,7 +70,7 @@ def process_rpc_json(data: str) -> dict[str, str]:
     """Process the JSON data which comes from the server which runs the pytest discovery."""
     str_stream: io.StringIO = io.StringIO(data)
 
-    length: int = None
+    length: int = 0
 
     while True:
         line: str = str_stream.readline()
