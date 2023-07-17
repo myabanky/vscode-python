@@ -392,6 +392,9 @@ export const PVSC_EXTENSION_ID = 'ms-python.python';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace PythonExtension {
+    /**
+     * Returns the API exposed by the Python extension in VS Code.
+     */
     export async function api(): Promise<PythonExtension> {
         const extension = extensions.getExtension(PVSC_EXTENSION_ID);
         if (extension === undefined) {
