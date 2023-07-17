@@ -316,6 +316,7 @@ export type EnvironmentPath = {
  * was contributed.
  */
 export type EnvironmentTools = KnownEnvironmentTools | string;
+
 /**
  * Tools or plugins the Python extension currently has built-in support for. Note this list is expected to shrink
  * once tools have their own separate extensions.
@@ -334,6 +335,7 @@ export type KnownEnvironmentTools =
  * Type of the environment. It can be {@link KnownEnvironmentTypes} or custom string which was contributed.
  */
 export type EnvironmentType = KnownEnvironmentTypes | string;
+
 /**
  * Environment types the Python extension is aware of. Note this list is expected to shrink once tools have their
  * own separate extensions, in which case they're expected to provide the type themselves.
