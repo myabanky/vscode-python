@@ -111,16 +111,6 @@ export function buildApi(
                 return { execCommand: pythonPath === '' ? undefined : [pythonPath] };
             },
         },
-        // These are for backwards compatibility. Other extensions are using these APIs and we don't want
-        // to force them to move to the jupyter extension ... yet.
-        datascience: {
-            registerRemoteServerProvider: jupyterIntegration
-                ? jupyterIntegration.registerRemoteServerProvider.bind(jupyterIntegration)
-                : ((noop as unknown) as (serverProvider: IJupyterUriProvider) => void),
-            showDataViewer: jupyterIntegration
-                ? jupyterIntegration.showDataViewer.bind(jupyterIntegration)
-                : ((noop as unknown) as (dataProvider: IDataViewerDataProvider, title: string) => Promise<void>),
-        },
         pylance: {
             createClient: (...args: any[]): BaseLanguageClient => {
                 // Make sure we share output channel so that we can share one with
